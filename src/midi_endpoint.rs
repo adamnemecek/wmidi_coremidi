@@ -1,4 +1,4 @@
-use crate::MIDIPortKind;
+use crate::prelude::*;
 
 // use core_foundation::string::__CFString;
 // use coremidi_sys::MIDIEndpointRef;
@@ -27,7 +27,7 @@ impl Ord for MIDIEndpoint {
 }
 
 impl MIDIEndpoint {
-    fn id(&self) -> i32 {
+    pub(crate) fn id(&self) -> i32 {
         unsafe { self.i32_property(coremidi_sys::kMIDIPropertyUniqueID) }
     }
 
@@ -44,11 +44,22 @@ impl MIDIEndpoint {
     }
 
     pub(crate) fn kind(&self) -> MIDIPortKind {
+        // return MIDIPortType(MIDIObjectGetType(id: id))
+        // unsafe { coremidi_sys::MIDIObjectGetTy }
         todo!()
     }
 
     pub(crate) fn version(&self) -> u32 {
         unsafe { self.i32_property(coremidi_sys::kMIDIPropertyDriverVersion) as _ }
+    }
+
+    pub(crate) fn state(&self) -> MIDIPortDeviceState {
+        let v = unsafe { self.i32_property(coremidi_sys::kMIDIPropertyOffline) };
+        if v == 0 {
+            MIDIPortDeviceState::Connected
+        } else {
+            MIDIPortDeviceState::Disconnected
+        }
     }
 
     pub(crate) fn flush(&self) {
@@ -81,5 +92,23 @@ impl MIDIEndpoint {
             let slice = std::slice::from_raw_parts(data, len as _);
             std::str::from_utf8(slice).unwrap()
         }
+    }
+}
+
+fn MIDIObjectGetType(id: coremidi_sys::MIDIEndpointRef) -> MIDIPortKind {
+    // let object = std::mem::MaybeUninit::uninit();
+    let kind = coremidi_sys::kMIDIObjectType_Other;
+    // let kind = coremidi_sys::MIDIObjectType::Other;
+    use coremidi_sys::{
+        MIDIObjectFindByUniqueID,
+        MIDIUniqueID,
+    };
+
+    // os_assert(MIDIObjectFindByUniqueID(id, &mut object, &mut kind));
+
+    // os_assert(MIDIObjectFindByUniqueID(MIDIUniqueID(id), &object, &kind));
+    // return type
+    match kind {
+        _ => todo!(),
     }
 }
