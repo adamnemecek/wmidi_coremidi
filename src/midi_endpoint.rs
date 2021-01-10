@@ -8,6 +8,12 @@ pub(crate) struct MIDIEndpoint {
     inner: coremidi_sys::MIDIEndpointRef,
 }
 
+impl MIDIEndpoint {
+    pub(crate) fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
+        Self { inner }
+    }
+}
+
 impl std::hash::Hash for MIDIEndpoint {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.id().hash(state)

@@ -5,6 +5,16 @@ pub struct MIDIOutput {
     inner: std::rc::Rc<std::cell::RefCell<MIDIOutputImpl>>,
 }
 
+impl MIDIOutput {
+    pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+        Self {
+            inner: std::rc::Rc::new(std::cell::RefCell::new(MIDIOutputImpl::new(
+                client, endpoint,
+            ))),
+        }
+    }
+}
+
 impl MIDIPort for MIDIOutput {
     fn id(&self) -> u32 {
         self.inner.borrow().id()
@@ -42,6 +52,16 @@ struct MIDIOutputImpl {
     endpoint: MIDIEndpoint,
     port: Option<coremidi_sys::MIDIPortRef>,
     client: MIDIClient,
+}
+
+impl MIDIOutputImpl {
+    fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+        Self {
+            client,
+            endpoint,
+            port: None,
+        }
+    }
 }
 
 impl PartialOrd for MIDIOutputImpl {
