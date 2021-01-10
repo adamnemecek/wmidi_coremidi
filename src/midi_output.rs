@@ -51,16 +51,19 @@ impl std::hash::Hash for MIDIOutputImpl {
 }
 
 impl MIDIOutputImpl {
-    fn open(&mut self) {
-        self.port = Some(self.client.create_output_port(""));
-    }
-
     pub fn connection(&self) -> MIDIPortConnectionState {
         if self.port.is_some() {
             MIDIPortConnectionState::Open
         } else {
             MIDIPortConnectionState::Closed
         }
+    }
+
+    fn open(&mut self) {
+        if self.connection() == MIDIPortConnectionState::Open {
+            return;
+        }
+        self.port = Some(self.client.create_output_port(""));
     }
 
     fn close(&mut self) {
