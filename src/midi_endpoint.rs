@@ -3,16 +3,44 @@ use crate::prelude::*;
 // use core_foundation::string::__CFString;
 // use coremidi_sys::MIDIEndpointRef;
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum MIDIEndpointKind {
+    Device,
+    Entity,
+    Source,
+    Destination,
+    ExternalDevice,
+    ExternalEntity,
+    ExternalSource,
+    ExternalDestination,
+}
 
+impl From<coremidi_sys::MIDIObjectType> for MIDIEndpointKind {
+    fn from(a: coremidi_sys::MIDIObjectType) -> Self {
+        match a {
+            coremidi_sys::kMIDIObjectType_Device => Self::Device,
+            coremidi_sys::kMIDIObjectType_Entity => Self::Entity,
+            coremidi_sys::kMIDIObjectType_Source => Self::Source,
+            coremidi_sys::kMIDIObjectType_Destination => Self::Destination,
+            coremidi_sys::kMIDIObjectType_ExternalDevice => Self::ExternalDevice,
+            coremidi_sys::kMIDIObjectType_ExternalEntity => Self::ExternalEntity,
+            coremidi_sys::kMIDIObjectType_ExternalSource => Self::ExternalSource,
+            coremidi_sys::kMIDIObjectType_ExternalDestination => Self::ExternalDestination,
+            _ => todo!(),
+        }
+    }
+}
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub struct MIDIEndpoint {
-    inner: std::rc::Rc<MIDIEndpointImpl>
+    inner: std::rc::Rc<MIDIEndpointImpl>,
 }
 
 impl MIDIEndpoint {
     pub fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
-        Self { inner: std::rc::Rc::new(MIDIEndpointImpl::new(inner)) }
+        Self {
+            inner: std::rc::Rc::new(MIDIEndpointImpl::new(inner)),
+        }
     }
 
     pub fn flush(&self) {
@@ -33,7 +61,6 @@ impl MIDIEndpointImpl {
     fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
         Self { inner }
     }
-
 }
 
 impl std::hash::Hash for MIDIEndpointImpl {
@@ -56,7 +83,7 @@ impl Ord for MIDIEndpointImpl {
 
 impl std::fmt::Debug for MIDIEndpointImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        write!(f, "MIDIEndpoint {{{} {} {}}}", self.id(), self.display_name(), self.manufacturer())
     }
 }
 
@@ -77,10 +104,19 @@ impl MIDIEndpointImpl {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyDisplayName) }
     }
 
-    fn kind(&self) -> MIDIPortKind {
-        // return MIDIPortType(MIDIObjectGetType(id: id))
-        // unsafe { coremidi_sys::MIDIObjectGetTy }
-        todo!()
+    fn kind(&self) -> MIDIEndpointKind {
+        let mut obj = 0;
+        let mut kind = 0;
+
+        unsafe {
+            // coremidi_sys::MIDIObjectFindByUniqueID(self.inner)
+            os_assert(coremidi_sys::MIDIObjectFindByUniqueID(
+                self.id(),
+                &mut obj,
+                &mut kind,
+            ));
+        }
+        kind.into()
     }
 
     fn version(&self) -> u32 {
@@ -128,7 +164,6 @@ impl MIDIEndpointImpl {
         }
     }
 }
-
 
 fn MIDIObjectGetType(id: coremidi_sys::MIDIEndpointRef) -> MIDIPortKind {
     // let object = std::mem::MaybeUninit::uninit();
