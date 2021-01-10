@@ -4,12 +4,12 @@ use crate::prelude::*;
 // use coremidi_sys::MIDIEndpointRef;
 
 #[derive(Clone, PartialEq, Eq)]
-pub(crate) struct MIDIEndpoint {
+pub struct MIDIEndpoint {
     inner: coremidi_sys::MIDIEndpointRef,
 }
 
 impl MIDIEndpoint {
-    pub(crate) fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
+    pub fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
         Self { inner }
     }
 }
@@ -33,33 +33,33 @@ impl Ord for MIDIEndpoint {
 }
 
 impl MIDIEndpoint {
-    pub(crate) fn id(&self) -> i32 {
+    pub fn id(&self) -> i32 {
         unsafe { self.i32_property(coremidi_sys::kMIDIPropertyUniqueID) }
     }
 
-    pub(crate) fn manufacturer(&self) -> &str {
+    pub fn manufacturer(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyManufacturer) }
     }
 
-    pub(crate) fn name(&self) -> &str {
+    pub fn name(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyName) }
     }
 
-    pub(crate) fn display_name(&self) -> &str {
+    pub fn display_name(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyDisplayName) }
     }
 
-    pub(crate) fn kind(&self) -> MIDIPortKind {
+    pub fn kind(&self) -> MIDIPortKind {
         // return MIDIPortType(MIDIObjectGetType(id: id))
         // unsafe { coremidi_sys::MIDIObjectGetTy }
         todo!()
     }
 
-    pub(crate) fn version(&self) -> u32 {
+    pub fn version(&self) -> u32 {
         unsafe { self.i32_property(coremidi_sys::kMIDIPropertyDriverVersion) as _ }
     }
 
-    pub(crate) fn state(&self) -> MIDIPortDeviceState {
+    pub fn state(&self) -> MIDIPortDeviceState {
         let v = unsafe { self.i32_property(coremidi_sys::kMIDIPropertyOffline) };
         if v == 0 {
             MIDIPortDeviceState::Connected
@@ -68,7 +68,7 @@ impl MIDIEndpoint {
         }
     }
 
-    pub(crate) fn flush(&self) {
+    pub fn flush(&self) {
         unsafe {
             coremidi_sys::MIDIFlushOutput(self.inner);
         }
@@ -84,22 +84,23 @@ impl MIDIEndpoint {
 
     fn str_property(&self, property_id: *const core_foundation::string::__CFString) -> &str {
         use core_foundation::string::{
-            __CFString,
             kCFStringEncodingUTF8,
             CFStringGetCStringPtr,
             CFStringGetLength,
         };
-        let s: *mut *const __CFString = std::ptr::null_mut();
+        let mut s = std::mem::MaybeUninit::uninit();
 
         unsafe {
-            coremidi_sys::MIDIObjectGetStringProperty(self.inner, property_id, s);
-            let len = CFStringGetLength(*s);
-            let data = CFStringGetCStringPtr(*s, kCFStringEncodingUTF8) as *const u8;
+            coremidi_sys::MIDIObjectGetStringProperty(self.inner, property_id, s.as_mut_ptr());
+            let s = s.assume_init();
+            let len = CFStringGetLength(s);
+            let data = CFStringGetCStringPtr(s, kCFStringEncodingUTF8) as *const u8;
             let slice = std::slice::from_raw_parts(data, len as _);
             std::str::from_utf8(slice).unwrap()
         }
     }
 }
+
 
 fn MIDIObjectGetType(id: coremidi_sys::MIDIEndpointRef) -> MIDIPortKind {
     // let object = std::mem::MaybeUninit::uninit();

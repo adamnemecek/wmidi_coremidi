@@ -40,24 +40,24 @@ impl MIDIPortMap<MIDIOutput> {
         Self { inner }
     }
 
-    pub(crate) fn new1(client: MIDIClient) -> Self {
-        let mut inner = std::collections::HashMap::new();
-        let mut i = MIDISourceIterator::new();
-        while let Some(endpoint) = i.next() {
-            let output = MIDIOutput::new(client.clone(), endpoint);
-            inner.insert(output.id(), output);
-        }
-        Self { inner }
-    }
+    // pub(crate) fn new1(client: MIDIClient) -> Self {
+    //     let mut inner = std::collections::HashMap::new();
+    //     let mut i = MIDISourceIterator::new();
+    //     while let Some(endpoint) = i.next() {
+    //         let output = MIDIOutput::new(client.clone(), endpoint);
+    //         inner.insert(output.id(), output);
+    //     }
+    //     Self { inner }
+    // }
 }
 
-struct MIDISourceIterator {
+pub struct MIDISourceIterator {
     len: usize,
     index: usize,
 }
 
 impl MIDISourceIterator {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             index: 0,
             len: unsafe { coremidi_sys::MIDIGetNumberOfSources() } as _,
@@ -76,41 +76,43 @@ impl Iterator for MIDISourceIterator {
         if self.index >= self.len {
             None
         } else {
+            let index = self.index;
+            self.index += 1;
             Some(MIDIEndpoint::new(unsafe {
-                coremidi_sys::MIDIGetSource(self.index as _)
+                coremidi_sys::MIDIGetSource(index as _)
             }))
         }
     }
 }
 
-struct MIDIDestinationIterator {
-    len: usize,
-    index: usize,
-}
+// struct MIDIDestinationIterator {
+//     len: usize,
+//     index: usize,
+// }
 
-impl MIDIDestinationIterator {
-    fn new() -> Self {
-        Self {
-            index: 0,
-            len: unsafe { coremidi_sys::MIDIGetNumberOfDestinations() } as _,
-        }
-    }
-}
+// impl MIDIDestinationIterator {
+//     fn new() -> Self {
+//         Self {
+//             index: 0,
+//             len: unsafe { coremidi_sys::MIDIGetNumberOfDestinations() } as _,
+//         }
+//     }
+// }
 
-impl Iterator for MIDIDestinationIterator {
-    type Item = MIDIEndpoint;
+// impl Iterator for MIDIDestinationIterator {
+//     type Item = MIDIEndpoint;
 
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        (self.len, None)
-    }
+//     fn size_hint(&self) -> (usize, Option<usize>) {
+//         (self.len, None)
+//     }
 
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index >= self.len {
-            None
-        } else {
-            Some(MIDIEndpoint::new(unsafe {
-                coremidi_sys::MIDIGetDestination(self.index as _)
-            }))
-        }
-    }
-}
+//     fn next(&mut self) -> Option<Self::Item> {
+//         if self.index >= self.len {
+//             None
+//         } else {
+//             Some(MIDIEndpoint::new(unsafe {
+//                 coremidi_sys::MIDIGetDestination(self.index as _)
+//             }))
+//         }
+//     }
+// }
