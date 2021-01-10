@@ -2,12 +2,14 @@ use crate::prelude::*;
 
 #[derive(Clone, PartialEq, Eq)]
 struct MIDIClient {
-    inner: coremidi_sys::MIDIClientRef
+    inner: coremidi_sys::MIDIClientRef,
 }
 
 impl MIDIClient {
     pub fn new(name: &str) -> Self {
-        Self { inner: MIDIClientCreate(name) }
+        Self {
+            inner: MIDIClientCreate(name),
+        }
     }
 }
 
