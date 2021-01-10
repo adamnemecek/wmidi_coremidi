@@ -18,17 +18,23 @@ struct MIDIClientImpl {
     inner: coremidi_sys::MIDIClientRef,
 }
 
+impl MIDIClientImpl {
+    fn new(name: &str) -> Self {
+        Self {
+            inner: MIDIClientCreate(name),
+        }
+    }
+}
+
 impl std::hash::Hash for MIDIClientImpl {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.inner.hash(state)
     }
 }
 
-impl MIDIClientImpl {
-    fn new(name: &str) -> Self {
-        Self {
-            inner: MIDIClientCreate(name),
-        }
+impl PartialOrd for MIDIClientImpl {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.inner.partial_cmp(&other.inner)
     }
 }
 
