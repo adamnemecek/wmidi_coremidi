@@ -10,6 +10,7 @@ pub(crate) use crate::{
 };
 
 pub use crate::{
+    MIDIInput,
     MIDIPort,
     MIDIPortConnectionState,
     MIDIPortDeviceState,

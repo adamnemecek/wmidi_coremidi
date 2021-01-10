@@ -9,6 +9,35 @@ pub struct MIDIInput {
     inner: std::rc::Rc<std::cell::RefCell<MIDIInputImpl>>,
 }
 
+impl MIDIInput {
+    pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+        todo!()
+        // Self {
+        //     inner: std::rc::Rc::new(std::cell::RefCell::new(MIDIInputImpl::new(
+        //         client, endpoint,
+        //     ))),
+        // }
+    }
+}
+
+impl std::fmt::Debug for MIDIInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.inner.fmt(f)
+    }
+}
+
+impl std::hash::Hash for MIDIInput {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        todo!()
+    }
+}
+
+impl MIDIPort for MIDIInput {
+    fn id(&self) -> u32 {
+        todo!()
+    }
+}
+
 #[derive(Clone, PartialEq, Eq)]
 struct MIDIInputImpl {
     endpoint: MIDIEndpoint,
@@ -22,5 +51,12 @@ impl MIDIInputImpl {
         // }
 
         // OSAssert(MIDIPortConnectSource(ref, endpoint.ref, nil))
+    }
+}
+
+impl std::fmt::Debug for MIDIInputImpl {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // self.inner.fmt(f)
+        todo!()
     }
 }

@@ -9,6 +9,22 @@ pub struct MIDIPortMap<T: MIDIPort> {
 
 impl<T: MIDIPort> MIDIPortMap<T> {}
 
+impl MIDIPortMap<MIDIInput> {
+    pub(crate) fn new(client: MIDIClient) -> Self {
+        let count = unsafe { coremidi_sys::MIDIGetNumberOfSources() } as _;
+        let mut inner = std::collections::HashMap::with_capacity(count);
+
+        unsafe {
+            for i in 0..count {
+                let endpoint = coremidi_sys::MIDIGetDestination(i as _);
+                let output = MIDIInput::new(client.clone(), MIDIEndpoint::new(endpoint));
+                inner.insert(output.id(), output);
+            }
+        }
+        Self { inner }
+    }
+}
+
 impl MIDIPortMap<MIDIOutput> {
     pub(crate) fn new(client: MIDIClient) -> Self {
         let count = unsafe { coremidi_sys::MIDIGetNumberOfDestinations() } as _;
@@ -22,5 +38,37 @@ impl MIDIPortMap<MIDIOutput> {
             }
         }
         Self { inner }
+    }
+}
+
+struct MIDISourceIterator {
+    len: usize,
+    index: usize,
+}
+
+impl MIDISourceIterator {
+    fn new() -> Self {
+        Self {
+            index: 0,
+            len: unsafe { coremidi_sys::MIDIGetNumberOfDestinations() } as _,
+        }
+    }
+}
+
+impl Iterator for MIDISourceIterator {
+    type Item = MIDIEndpoint;
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.len, None)
+    }
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= self.len {
+            None
+        } else {
+            Some(MIDIEndpoint::new(unsafe {
+                coremidi_sys::MIDIGetSource(self.index as _)
+            }))
+        }
     }
 }
