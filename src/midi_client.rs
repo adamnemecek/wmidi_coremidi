@@ -58,13 +58,9 @@ impl MIDIClientImpl {
     fn notification(&mut self, u: u32) {}
 
     fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
-        // let (tx, rx) = std::sync::mpsc::channel();
-        // std::thread::spawn(move || {
-        //     rx.recv();
-        // });
-
-        let inner = MIDIClientCreate(name, tx);
-        Self { inner }
+        Self {
+            inner: MIDIClientCreate(name, tx),
+        }
     }
 
     fn create_input_port(
@@ -79,7 +75,6 @@ impl MIDIClientImpl {
             use core_foundation::base::TCFType;
 
             let name = core_foundation::string::CFString::new(name);
-            // let name = core_foundation::string::__CFString::from(&name);
             os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
                 self.inner,
                 name.as_concrete_TypeRef(),
