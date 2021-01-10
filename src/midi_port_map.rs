@@ -7,14 +7,24 @@ pub struct MIDIPortMap<T: MIDIPort> {
     inner: std::collections::HashMap<MIDIPortID, T>,
 }
 
-// impl<T: MIDIPort> MIDIPortMap<T> {
+impl<T: MIDIPort> MIDIPortMap<T> {
+    pub(crate) fn insert(&mut self, port: T) {
+        debug_assert!(!self.inner.contains_key(&port.id()));
 
-// }
+        self.inner.insert(port.id(), port);
+    }
+}
 
 impl<T: MIDIPort> std::ops::Index<MIDIPortID> for MIDIPortMap<T> {
     type Output = T;
     fn index(&self, index: MIDIPortID) -> &T {
-        todo!()
+        &self.inner[&index]
+    }
+}
+
+impl<T: MIDIPort> std::ops::IndexMut<MIDIPortID> for MIDIPortMap<T> {
+    fn index_mut(&mut self, index: MIDIPortID) -> &mut T {
+        self.inner.get_mut(&index).unwrap()
     }
 }
 
