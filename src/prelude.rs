@@ -4,4 +4,13 @@ pub fn os_assert(status: i32) {
     }
 }
 
-pub(crate) use crate::{MIDIClient, MIDIEndpoint};
+pub(crate) use crate::{
+    MIDIClient,
+    MIDIEndpoint,
+};
+
+pub use crate::{
+    MIDIPortConnectionState,
+    MIDIPortDeviceState,
+    MIDIPortKind,
+};
