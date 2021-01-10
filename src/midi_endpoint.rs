@@ -29,6 +29,18 @@ impl MIDIEndpoint {
         todo!()
     }
 
+    pub(crate) fn manufacturer(&self) -> &str {
+        unsafe { self.str_property(coremidi_sys::kMIDIPropertyManufacturer) }
+    }
+
+    pub(crate) fn name(&self) -> &str {
+        unsafe { self.str_property(coremidi_sys::kMIDIPropertyName) }
+    }
+
+    pub(crate) fn display_name(&self) -> &str {
+        unsafe { self.str_property(coremidi_sys::kMIDIPropertyDisplayName) }
+    }
+
     pub(crate) fn flush(&self) {
         unsafe {
             coremidi_sys::MIDIFlushOutput(self.inner);

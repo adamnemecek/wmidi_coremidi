@@ -14,4 +14,13 @@ struct MIDIInputImpl {
     endpoint: MIDIEndpoint,
 }
 
-impl MIDIInputImpl {}
+impl MIDIInputImpl {
+    fn open(&self) {
+        // let `self` = self as! MIDIInput
+        // ref = MIDIInputPortCreate(ref: client.ref) {
+        //     `self`.onMIDIMessage?($0)
+        // }
+
+        // OSAssert(MIDIPortConnectSource(ref, endpoint.ref, nil))
+    }
+}

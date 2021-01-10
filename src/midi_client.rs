@@ -49,6 +49,7 @@ impl MIDIClientImpl {
         name: &str,
         f: impl FnMut(&coremidi_sys::MIDIPacketList),
     ) -> coremidi_sys::MIDIPortRef {
+        // let notify_block = block::ConcreteBlock::new(move |evt: &SharedEventRef, val: u64| {
         // let b = block::ConcreteBlock::<(), ()>::new();
         todo!()
     }
@@ -87,10 +88,11 @@ impl Drop for MIDIClientImpl {
 }
 
 fn MIDIClientCreate(name: &str) -> coremidi_sys::MIDIClientRef {
-    // let mut client_ref = MaybeUninit::uninit();
+    // let mut client_ref = std::mem::MaybeUninit::uninit();
     // coremidi_sys::MIDIClientCreateWithBlock(name, outClient, notifyBlock)
     // coremidi_sys::MIDIClientCreateWithBlock()
     // coremidi_sys::MIDIClientCreateWithBlock(name, outClient, notifyBlock)
     // inner
+    // *client_ref
     todo!()
 }
