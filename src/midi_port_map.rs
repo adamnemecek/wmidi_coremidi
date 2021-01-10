@@ -4,13 +4,22 @@ use crate::{
 };
 
 pub struct MIDIPortMap<T: MIDIPort> {
-    inner: std::collections::HashMap<u32, T>,
+    inner: std::collections::HashMap<MIDIPortID, T>,
 }
 
-impl<T: MIDIPort> MIDIPortMap<T> {}
+// impl<T: MIDIPort> MIDIPortMap<T> {
+
+// }
+
+impl<T: MIDIPort> std::ops::Index<MIDIPortID> for MIDIPortMap<T> {
+    type Output = T;
+    fn index(&self, index: MIDIPortID) -> &T {
+        todo!()
+    }
+}
 
 impl MIDIPortMap<MIDIInput> {
-    pub(crate) fn new(client: MIDIClient) -> Self {
+    pub(crate) fn new(client: &MIDIClient) -> Self {
         let count = unsafe { coremidi_sys::MIDIGetNumberOfSources() } as _;
         let mut inner = std::collections::HashMap::with_capacity(count);
 
@@ -26,7 +35,7 @@ impl MIDIPortMap<MIDIInput> {
 }
 
 impl MIDIPortMap<MIDIOutput> {
-    pub(crate) fn new(client: MIDIClient) -> Self {
+    pub(crate) fn new(client: &MIDIClient) -> Self {
         let count = unsafe { coremidi_sys::MIDIGetNumberOfDestinations() } as _;
         let mut inner = std::collections::HashMap::with_capacity(count);
 
@@ -40,15 +49,15 @@ impl MIDIPortMap<MIDIOutput> {
         Self { inner }
     }
 
-    pub(crate) fn new1(client: MIDIClient) -> Self {
-        let mut inner = std::collections::HashMap::new();
-        let mut i = MIDISourceIterator::new();
-        for endpoint in i {
-            let output = MIDIOutput::new(client.clone(), endpoint);
-            inner.insert(output.id(), output);
-        }
-        Self { inner }
-    }
+    // pub(crate) fn new1(client: MIDIClient) -> Self {
+    //     let mut inner = std::collections::HashMap::new();
+    //     let mut i = MIDISourceIterator::new();
+    //     for endpoint in i {
+    //         let output = MIDIOutput::new(client.clone(), endpoint);
+    //         inner.insert(output.id(), output);
+    //     }
+    //     Self { inner }
+    // }
 }
 
 pub struct MIDISourceIterator {

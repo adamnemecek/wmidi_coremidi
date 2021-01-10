@@ -17,6 +17,17 @@ pub enum MIDIPortConnectionState {
     Closed,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct MIDIPortID {
+    inner: u32,
+}
+
+impl MIDIPortID {
+    pub(crate) fn new(inner: u32) -> Self {
+        Self { inner }
+    }
+}
+
 pub trait MIDIPort: Eq + std::hash::Hash + std::fmt::Debug {
-    fn id(&self) -> u32;
+    fn id(&self) -> MIDIPortID;
 }

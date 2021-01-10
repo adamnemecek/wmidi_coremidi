@@ -1,13 +1,28 @@
-use crate::prelude::*;
+use crate::{
+    prelude::*,
+    MIDIOutput,
+};
 
 pub struct MIDIAccess {
-    client: MIDIClient,
+    inner: std::rc::Rc<MIDIAccessImpl>,
 }
 
-impl MIDIAccess {
-    pub fn new(name: &str) -> Self {
+struct MIDIAccessImpl {
+    client: MIDIClient,
+    inputs: MIDIPortMap<MIDIInput>,
+    outputs: MIDIPortMap<MIDIOutput>,
+}
+
+impl MIDIAccessImpl {
+    fn new(name: &str) -> Self {
+        let client = MIDIClient::new(name);
+        let inputs = MIDIPortMap::<MIDIInput>::new(&client);
+        let outputs = MIDIPortMap::<MIDIOutput>::new(&client);
+
         Self {
-            client: MIDIClient::new(name),
+            client,
+            inputs,
+            outputs,
         }
     }
 }

@@ -16,8 +16,9 @@ impl MIDIOutput {
 }
 
 impl MIDIPort for MIDIOutput {
-    fn id(&self) -> u32 {
-        self.inner.borrow().id()
+    fn id(&self) -> MIDIPortID {
+        // MIDIPortID::new(self.inner.borrow().id())
+        todo!()
     }
 }
 
@@ -83,7 +84,7 @@ impl std::hash::Hash for MIDIOutputImpl {
 }
 
 impl MIDIOutputImpl {
-    fn id(&self) -> u32 {
+    fn id(&self) -> MIDIPortID {
         todo!()
     }
 

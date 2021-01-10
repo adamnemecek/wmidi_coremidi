@@ -83,7 +83,13 @@ impl Ord for MIDIEndpointImpl {
 
 impl std::fmt::Debug for MIDIEndpointImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MIDIEndpoint {{{} {} {}}}", self.id(), self.display_name(), self.manufacturer())
+        write!(
+            f,
+            "MIDIEndpoint {{{} {} {}}}",
+            self.id(),
+            self.display_name(),
+            self.manufacturer()
+        )
     }
 }
 

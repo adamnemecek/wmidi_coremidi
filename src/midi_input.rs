@@ -33,7 +33,7 @@ impl std::hash::Hash for MIDIInput {
 }
 
 impl MIDIPort for MIDIInput {
-    fn id(&self) -> u32 {
+    fn id(&self) -> MIDIPortID {
         todo!()
     }
 }

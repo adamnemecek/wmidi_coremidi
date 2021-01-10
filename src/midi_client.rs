@@ -41,7 +41,7 @@ impl MIDIClientImpl {
     }
 
     fn new_with_notification(name: &str) -> Self {
-        Self { inner: todo!() }
+        todo!()
     }
 
     fn create_input_port(
