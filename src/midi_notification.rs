@@ -1,6 +1,6 @@
 pub(crate) enum MIDINotification {
     Added(),
-    Removed()
+    Removed(),
 }
 
 // impl From<coremidi_sys::MIDINotification> for Option<MIDINotification> {

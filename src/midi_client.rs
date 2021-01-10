@@ -15,7 +15,7 @@ impl MIDIClient {
     pub fn create_input_port(
         &self,
         name: &str,
-        f: impl FnMut(&coremidi_sys::MIDIPacketList),
+        f: impl Fn(&coremidi_sys::MIDIPacketList) + 'static,
     ) -> coremidi_sys::MIDIPortRef {
         self.inner.create_input_port(name, f)
     }
@@ -47,11 +47,23 @@ impl MIDIClientImpl {
     fn create_input_port(
         &self,
         name: &str,
-        f: impl FnMut(&coremidi_sys::MIDIPacketList),
+        f: impl Fn(&coremidi_sys::MIDIPacketList) + 'static,
     ) -> coremidi_sys::MIDIPortRef {
-        // let notify_block = block::ConcreteBlock::new(move |evt: &SharedEventRef, val: u64| {
-        // let b = block::ConcreteBlock::<(), ()>::new();
-        todo!()
+        let mut out = 0;
+        let block = block::ConcreteBlock::new(move |p: &coremidi_sys::MIDIPacketList| f(p)).copy();
+
+        unsafe {
+            use core_foundation::base::TCFType;
+            let name = core_foundation::string::CFString::new(name);
+            // let name = core_foundation::string::__CFString::from(&name);
+            os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
+                self.inner,
+                name.as_concrete_TypeRef(),
+                &mut out,
+                std::mem::transmute(block),
+            ));
+        }
+        out
     }
 
     fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {

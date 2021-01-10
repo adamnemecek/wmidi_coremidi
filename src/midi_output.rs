@@ -63,8 +63,6 @@ impl MIDIOutputImpl {
             port: None,
         }
     }
-
-
 }
 
 impl PartialOrd for MIDIOutputImpl {

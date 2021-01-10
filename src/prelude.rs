@@ -11,14 +11,13 @@ pub(crate) use crate::{
 };
 
 pub use crate::{
-    MIDIPortID,
     MIDIAccess,
     MIDIInput,
     MIDIOutput,
     MIDIPort,
     MIDIPortConnectionState,
     MIDIPortDeviceState,
+    MIDIPortID,
     MIDIPortKind,
     MIDIPortMap,
-
 };
