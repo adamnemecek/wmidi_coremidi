@@ -12,8 +12,12 @@ impl MIDIClient {
         }
     }
 
-    pub fn create_input_port(&self) -> coremidi_sys::MIDIPortRef {
-        todo!()
+    pub fn create_input_port(
+        &self,
+        name: &str,
+        f: impl FnMut(&coremidi_sys::MIDIPacketList),
+    ) -> coremidi_sys::MIDIPortRef {
+        self.inner.create_input_port(name, f)
     }
 
     pub fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
@@ -27,6 +31,7 @@ struct MIDIClientImpl {
 }
 
 type MIDIReceiveBlock = block::Block<(*const coremidi_sys::MIDIPacketList), ()>;
+
 // coremidi_sys::MIDIReadBlock
 impl MIDIClientImpl {
     fn new(name: &str) -> Self {
@@ -39,7 +44,11 @@ impl MIDIClientImpl {
         Self { inner: todo!() }
     }
 
-    pub fn create_input_port(&self) -> coremidi_sys::MIDIPortRef {
+    fn create_input_port(
+        &self,
+        name: &str,
+        f: impl FnMut(&coremidi_sys::MIDIPacketList),
+    ) -> coremidi_sys::MIDIPortRef {
         // let b = block::ConcreteBlock::<(), ()>::new();
         todo!()
     }
