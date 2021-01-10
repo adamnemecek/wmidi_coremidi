@@ -35,6 +35,10 @@ impl MIDIClientImpl {
         }
     }
 
+    fn new_with_notification(name: &str) -> Self {
+        Self { inner: todo!() }
+    }
+
     pub fn create_input_port(&self) -> coremidi_sys::MIDIPortRef {
         // let b = block::ConcreteBlock::<(), ()>::new();
         todo!()
@@ -77,6 +81,7 @@ fn MIDIClientCreate(name: &str) -> coremidi_sys::MIDIClientRef {
     // let mut client_ref = MaybeUninit::uninit();
     // coremidi_sys::MIDIClientCreateWithBlock(name, outClient, notifyBlock)
     // coremidi_sys::MIDIClientCreateWithBlock()
+    // coremidi_sys::MIDIClientCreateWithBlock(name, outClient, notifyBlock)
     // inner
     todo!()
 }
