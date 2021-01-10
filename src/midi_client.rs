@@ -1,30 +1,58 @@
 use crate::prelude::*;
 
-#[derive(Clone, PartialEq, Eq)]
-pub(crate) struct MIDIClient {
-    inner: std::sync::Arc<std::cell::RefCell<MIDIClientImpl>>,
+// pub trait Hashable {
+//     fn get_hash(&self) -> u64;
+// }
+
+// impl<T: std::hash::Hash> Hashable for T {
+//     fn get_hash(&self) -> u64 {
+//         use std::hash::Hasher;
+//         use std::collections::hash_map::DefaultHasher;
+//         let mut s = DefaultHasher::new();
+//         self.hash(&mut s);
+//         s.finish()
+//     }
+// }
+
+fn hash<T: std::hash::Hash>(v: &T) -> u64 {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::Hasher;
+    let mut s = DefaultHasher::new();
+    v.hash(&mut s);
+    s.finish()
 }
 
+#[derive(Clone)]
+pub(crate) struct MIDIClient {
+    inner: std::sync::Arc<std::sync::Mutex<MIDIClientImpl>>,
+    hash: u64,
+}
+
+impl PartialEq for MIDIClient {
+    fn eq(&self, other: &Self) -> bool {
+        self.hash == other.hash
+    }
+}
+
+impl Eq for MIDIClient {}
+// input_observer: Option<std::sync::Arc<std::sync::Mutex<Box<dyn MIDIInputObserver>>>>,
+
 impl MIDIClient {
-    // pub fn new(name: &str) -> Self {
-    //     Self {
-    //         inner: std::sync::Arc::new(MIDIClientImpl::new(name)),
-    //     }
-    // }
-
-    fn notification(&mut self, u: u32) {}
-
     pub fn new(name: &str) -> Self {
         let (tx, rx) = std::sync::mpsc::channel();
 
-        let inner = std::sync::Arc::new(std::cell::RefCell::new(MIDIClientImpl::new(name, tx)));
-        let mut clone = inner.clone();
+        let client = MIDIClientImpl::new(name, tx);
+        let hash = hash(&client);
+        let inner = std::sync::Arc::new(std::sync::Mutex::new(client));
+        let clone = inner.clone();
+        // let self_ = Self { inner, hash };
         std::thread::spawn(move || {
             let d = rx.recv().unwrap();
-            // clone.borrow_mut().notification(d);
+            clone.lock().unwrap().notification(d);
         });
 
-        Self { inner }
+        // self_
+        Self { inner, hash }
     }
 
     pub fn create_input_port(
@@ -32,11 +60,11 @@ impl MIDIClient {
         name: &str,
         f: impl Fn(&coremidi_sys::MIDIPacketList) + 'static,
     ) -> coremidi_sys::MIDIPortRef {
-        self.inner.borrow().create_input_port(name, f)
+        self.inner.lock().unwrap().create_input_port(name, f)
     }
 
     pub fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
-        self.inner.borrow().create_output_port(name)
+        self.inner.lock().unwrap().create_output_port(name)
     }
 }
 
