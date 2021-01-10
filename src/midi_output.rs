@@ -1,9 +1,8 @@
 use crate::prelude::*;
 
-
 #[derive(Clone, PartialEq, Eq)]
 pub struct MIDIOutput {
-    inner: std::rc::Rc<std::cell::RefCell<MIDIOutputImpl>>
+    inner: std::rc::Rc<std::cell::RefCell<MIDIOutputImpl>>,
 }
 
 impl MIDIOutput {
@@ -20,11 +19,29 @@ impl MIDIOutput {
     }
 }
 
+impl std::fmt::Debug for MIDIOutput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.inner.fmt(f)
+    }
+}
+
 #[derive(Clone, PartialEq, Eq)]
 struct MIDIOutputImpl {
     endpoint: MIDIEndpoint,
     port: Option<coremidi_sys::MIDIPortRef>,
     client: MIDIClient,
+}
+
+impl PartialOrd for MIDIOutputImpl {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.endpoint.partial_cmp(&other.endpoint)
+    }
+}
+
+impl Ord for MIDIOutputImpl {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.endpoint.cmp(&other.endpoint)
+    }
 }
 
 impl std::hash::Hash for MIDIOutputImpl {
@@ -52,5 +69,11 @@ impl MIDIOutputImpl {
         }
         self.endpoint.flush();
         self.port = None;
+    }
+}
+
+impl std::fmt::Debug for MIDIOutputImpl {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
     }
 }

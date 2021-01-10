@@ -18,6 +18,12 @@ impl PartialOrd for MIDIEndpoint {
     }
 }
 
+impl Ord for MIDIEndpoint {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.inner.cmp(&other.inner)
+    }
+}
+
 impl MIDIEndpoint {
     fn id(&self) -> i64 {
         todo!()
