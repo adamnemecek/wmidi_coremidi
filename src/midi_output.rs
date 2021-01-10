@@ -6,4 +6,8 @@ pub struct MIDIOutput {
     client: MIDIClient,
 }
 
-impl MIDIOutput {}
+impl MIDIOutput {
+    fn open(&mut self) {
+        self.port = Some(self.client.create_output_port(""));
+    }
+}

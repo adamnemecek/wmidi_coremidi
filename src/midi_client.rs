@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct MIDIClient {
+pub(crate) struct MIDIClient {
     inner: std::rc::Rc<MIDIClientImpl>,
 }
 
@@ -10,6 +10,10 @@ impl MIDIClient {
         Self {
             inner: std::rc::Rc::new(MIDIClientImpl::new(name)),
         }
+    }
+
+    pub fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
+        self.inner.create_output_port(name)
     }
 }
 
@@ -23,6 +27,18 @@ impl MIDIClientImpl {
         Self {
             inner: MIDIClientCreate(name),
         }
+    }
+
+    fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
+        let mut out = 0;
+        let name = core_foundation::string::CFString::new(name);
+        unsafe {
+            // os_assert(coremidi_sys::MIDIOutputPortCreate(
+            //     self.inner, name.as_mut_ptr(), &mut out,
+            // ));
+            todo!();
+        }
+        out
     }
 }
 
