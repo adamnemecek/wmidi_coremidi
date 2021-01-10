@@ -23,7 +23,7 @@ impl MIDIEndpoint {
         todo!()
     }
 
-    fn flush(&self) {
+    pub(crate) fn flush(&self) {
         unsafe {
             coremidi_sys::MIDIFlushOutput(self.inner);
         }
