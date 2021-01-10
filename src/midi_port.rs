@@ -19,12 +19,18 @@ pub enum MIDIPortConnectionState {
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct MIDIPortID {
-    inner: u32,
+    pub(crate) inner: i32,
 }
 
 impl MIDIPortID {
-    pub(crate) fn new(inner: u32) -> Self {
+    pub(crate) fn new(inner: i32) -> Self {
         Self { inner }
+    }
+}
+
+impl std::fmt::Display for MIDIPortID {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "MIDIPortID {{{}}}", self.inner)
     }
 }
 

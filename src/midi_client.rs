@@ -36,7 +36,7 @@ type MIDIReceiveBlock = block::Block<(*const coremidi_sys::MIDIPacketList), ()>;
 impl MIDIClientImpl {
     fn new(name: &str) -> Self {
         Self {
-            inner: MIDIClientCreate(name),
+            inner: MIDIClientCreate(name, |x| { }),
         }
     }
 
@@ -54,6 +54,7 @@ impl MIDIClientImpl {
 
         unsafe {
             use core_foundation::base::TCFType;
+
             let name = core_foundation::string::CFString::new(name);
             // let name = core_foundation::string::__CFString::from(&name);
             os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
@@ -99,12 +100,17 @@ impl Drop for MIDIClientImpl {
     }
 }
 
-fn MIDIClientCreate(name: &str) -> coremidi_sys::MIDIClientRef {
-    // let mut client_ref = std::mem::MaybeUninit::uninit();
-    // coremidi_sys::MIDIClientCreateWithBlock(name, outClient, notifyBlock)
-    // coremidi_sys::MIDIClientCreateWithBlock()
-    // coremidi_sys::MIDIClientCreateWithBlock(name, outClient, notifyBlock)
-    // inner
-    // *client_ref
-    todo!()
+fn MIDIClientCreate(name: &str, f: impl Fn(MIDINotification) -> ()) -> coremidi_sys::MIDIClientRef {
+    let mut out = 0;
+    unsafe {
+        use core_foundation::base::TCFType;
+        let block = block::ConcreteBlock::new(move |notification: u32| {}).copy();
+        let name = core_foundation::string::CFString::new(name);
+        os_assert(coremidi_sys::MIDIClientCreateWithBlock(
+            name.as_concrete_TypeRef(),
+            &mut out,
+            std::mem::transmute(block),
+        ));
+    }
+    out
 }

@@ -1,3 +1,5 @@
+use wmidi_coremidi::prelude::*;
+
 fn main() {
     let i = wmidi_coremidi::MIDISourceIterator::new();
 
@@ -9,4 +11,6 @@ fn main() {
     // let b = "two";
 
     // println!("{:?} {:?}", a, b);
+
+    let access = MIDIAccess::new("example");
 }

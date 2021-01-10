@@ -47,8 +47,16 @@ impl MIDIEndpoint {
         todo!()
     }
 
+    pub fn id(&self) -> MIDIPortID {
+        self.inner.id()
+    }
+
     pub fn manufacturer(&self) -> &str {
         self.inner.manufacturer()
+    }
+
+    pub fn display_name(&self) -> &str {
+        self.inner.display_name()
     }
 }
 
@@ -94,8 +102,10 @@ impl std::fmt::Debug for MIDIEndpointImpl {
 }
 
 impl MIDIEndpointImpl {
-    fn id(&self) -> i32 {
-        unsafe { self.i32_property(coremidi_sys::kMIDIPropertyUniqueID) }
+    fn id(&self) -> MIDIPortID {
+        let id = unsafe { self.i32_property(coremidi_sys::kMIDIPropertyUniqueID) };
+
+        MIDIPortID::new(id as _)
     }
 
     fn manufacturer(&self) -> &str {
@@ -117,7 +127,7 @@ impl MIDIEndpointImpl {
         unsafe {
             // coremidi_sys::MIDIObjectFindByUniqueID(self.inner)
             os_assert(coremidi_sys::MIDIObjectFindByUniqueID(
-                self.id(),
+                self.id().inner,
                 &mut obj,
                 &mut kind,
             ));

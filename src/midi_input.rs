@@ -11,12 +11,11 @@ pub struct MIDIInput {
 
 impl MIDIInput {
     pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
-        todo!()
-        // Self {
-        //     inner: std::rc::Rc::new(std::cell::RefCell::new(MIDIInputImpl::new(
-        //         client, endpoint,
-        //     ))),
-        // }
+        Self {
+            inner: std::rc::Rc::new(std::cell::RefCell::new(MIDIInputImpl::new(
+                client, endpoint,
+            ))),
+        }
     }
 }
 
@@ -28,22 +27,33 @@ impl std::fmt::Debug for MIDIInput {
 
 impl std::hash::Hash for MIDIInput {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        todo!()
+        self.id().hash(state)
     }
 }
 
 impl MIDIPort for MIDIInput {
     fn id(&self) -> MIDIPortID {
-        todo!()
+        self.inner.borrow().id()
     }
 }
 
 #[derive(Clone, PartialEq, Eq)]
 struct MIDIInputImpl {
+    client: MIDIClient,
     endpoint: MIDIEndpoint,
 }
 
 impl MIDIInputImpl {
+    fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+        Self {
+            client, endpoint
+        }
+    }
+
+    fn id(&self) -> MIDIPortID {
+        self.endpoint.id()
+    }
+
     fn open(&self) {
         // let `self` = self as! MIDIInput
         // ref = MIDIInputPortCreate(ref: client.ref) {
@@ -56,7 +66,13 @@ impl MIDIInputImpl {
 
 impl std::fmt::Debug for MIDIInputImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // self.inner.fmt(f)
-        todo!()
+        write!(f, "MIDIClientImpl {}", self.endpoint.display_name())
+
+    }
+}
+
+impl std::hash::Hash for MIDIInputImpl {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.endpoint.id().hash(state)
     }
 }
