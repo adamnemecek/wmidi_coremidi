@@ -1,14 +1,22 @@
 use crate::prelude::*;
 
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct MIDIOutput {
-    inner: std::rc::Rc<MIDIOutputImpl>
+    inner: std::rc::Rc<std::cell::RefCell<MIDIOutputImpl>>
 }
 
 impl MIDIOutput {
     fn open(&mut self) {
-        self.inner.open();
+        self.inner.borrow_mut().open();
+    }
+
+    fn close(&mut self) {
+        self.inner.borrow_mut().close();
+    }
+
+    fn connection(&self) -> MIDIPortConnectionState {
+        self.inner.borrow().connection()
     }
 }
 
