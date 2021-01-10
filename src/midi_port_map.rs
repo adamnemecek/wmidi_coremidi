@@ -3,6 +3,16 @@ use crate::{
     MIDIOutput,
 };
 
+pub struct MIDIPortMapIterator<'a, T: MIDIPort> {
+    inner: std::collections::hash_map::Iter<'a, MIDIPortID, T>,
+}
+
+impl<'a, T: MIDIPort> Iterator for MIDIPortMapIterator<'a, T> {
+    type Item = (&'a MIDIPortID, &'a T);
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner.next()
+    }
+}
 pub struct MIDIPortMap<T: MIDIPort> {
     inner: std::collections::HashMap<MIDIPortID, T>,
 }
@@ -12,6 +22,12 @@ impl<T: MIDIPort> MIDIPortMap<T> {
         debug_assert!(!self.inner.contains_key(&port.id()));
 
         self.inner.insert(port.id(), port);
+    }
+
+    pub fn iter(&self) -> MIDIPortMapIterator<'_, T> {
+        MIDIPortMapIterator {
+            inner: self.inner.iter(),
+        }
     }
 }
 

@@ -36,6 +36,12 @@ impl MIDIOutput {
     }
 }
 
+impl std::fmt::Display for MIDIOutput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.inner.borrow().fmt(f)
+    }
+}
+
 impl std::fmt::Debug for MIDIOutput {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.inner.fmt(f)
@@ -88,7 +94,7 @@ impl MIDIOutputImpl {
         self.endpoint.id()
     }
 
-    pub fn connection(&self) -> MIDIPortConnectionState {
+    fn connection(&self) -> MIDIPortConnectionState {
         if self.port.is_some() {
             MIDIPortConnectionState::Open
         } else {
@@ -112,8 +118,14 @@ impl MIDIOutputImpl {
     }
 }
 
+impl std::fmt::Display for MIDIOutputImpl {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "MIDIOutput")
+    }
+}
+
 impl std::fmt::Debug for MIDIOutputImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        write!(f, "MIDIOutput")
     }
 }

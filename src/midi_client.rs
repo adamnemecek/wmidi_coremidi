@@ -1,15 +1,30 @@
 use crate::prelude::*;
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq)]
 pub(crate) struct MIDIClient {
-    inner: std::rc::Rc<MIDIClientImpl>,
+    inner: std::sync::Arc<std::cell::RefCell<MIDIClientImpl>>,
 }
 
 impl MIDIClient {
+    // pub fn new(name: &str) -> Self {
+    //     Self {
+    //         inner: std::sync::Arc::new(MIDIClientImpl::new(name)),
+    //     }
+    // }
+
+    fn notification(&mut self, u: u32) {}
+
     pub fn new(name: &str) -> Self {
-        Self {
-            inner: std::rc::Rc::new(MIDIClientImpl::new(name)),
-        }
+        let (tx, rx) = std::sync::mpsc::channel();
+
+        let inner = std::sync::Arc::new(std::cell::RefCell::new(MIDIClientImpl::new(name, tx)));
+        let mut clone = inner.clone();
+        std::thread::spawn(move || {
+            let d = rx.recv().unwrap();
+            // clone.borrow_mut().notification(d);
+        });
+
+        Self { inner }
     }
 
     pub fn create_input_port(
@@ -17,11 +32,11 @@ impl MIDIClient {
         name: &str,
         f: impl Fn(&coremidi_sys::MIDIPacketList) + 'static,
     ) -> coremidi_sys::MIDIPortRef {
-        self.inner.create_input_port(name, f)
+        self.inner.borrow().create_input_port(name, f)
     }
 
     pub fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
-        self.inner.create_output_port(name)
+        self.inner.borrow().create_output_port(name)
     }
 }
 
@@ -30,18 +45,26 @@ struct MIDIClientImpl {
     inner: coremidi_sys::MIDIClientRef,
 }
 
-type MIDIReceiveBlock = block::Block<(*const coremidi_sys::MIDIPacketList), ()>;
+// type MIDIReceiveBlock = block::Block<(*const coremidi_sys::MIDIPacketList), ()>;
 
 // coremidi_sys::MIDIReadBlock
 impl MIDIClientImpl {
-    fn new(name: &str) -> Self {
-        Self {
-            inner: MIDIClientCreate(name, |x| { }),
-        }
-    }
+    // fn new(name: &str) -> Self {
+    //     Self {
+    //         inner: MIDIClientCreate(name, |x| { }),
+    //     }
+    // }
 
-    fn new_with_notification(name: &str) -> Self {
-        todo!()
+    fn notification(&mut self, u: u32) {}
+
+    fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
+        // let (tx, rx) = std::sync::mpsc::channel();
+        // std::thread::spawn(move || {
+        //     rx.recv();
+        // });
+
+        let inner = MIDIClientCreate(name, tx);
+        Self { inner }
     }
 
     fn create_input_port(
@@ -100,11 +123,14 @@ impl Drop for MIDIClientImpl {
     }
 }
 
-fn MIDIClientCreate(name: &str, f: impl Fn(MIDINotification) -> ()) -> coremidi_sys::MIDIClientRef {
+fn MIDIClientCreate(name: &str, tx: std::sync::mpsc::Sender<u32>) -> coremidi_sys::MIDIClientRef {
     let mut out = 0;
     unsafe {
         use core_foundation::base::TCFType;
-        let block = block::ConcreteBlock::new(move |notification: u32| {}).copy();
+        let block = block::ConcreteBlock::new(move |notification: u32| {
+            tx.send(10);
+        })
+        .copy();
         let name = core_foundation::string::CFString::new(name);
         os_assert(coremidi_sys::MIDIClientCreateWithBlock(
             name.as_concrete_TypeRef(),

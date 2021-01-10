@@ -13,4 +13,8 @@ fn main() {
     // println!("{:?} {:?}", a, b);
 
     let access = MIDIAccess::new("example");
+
+    for (k, v) in access.outputs().iter() {
+        println!("{} {}", k, v);
+    }
 }

@@ -45,9 +45,7 @@ struct MIDIInputImpl {
 
 impl MIDIInputImpl {
     fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
-        Self {
-            client, endpoint
-        }
+        Self { client, endpoint }
     }
 
     fn id(&self) -> MIDIPortID {
@@ -67,7 +65,6 @@ impl MIDIInputImpl {
 impl std::fmt::Debug for MIDIInputImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "MIDIClientImpl {}", self.endpoint.display_name())
-
     }
 }
 
