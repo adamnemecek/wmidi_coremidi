@@ -1,3 +1,5 @@
+use crate::MIDIPortKind;
+
 // use core_foundation::string::__CFString;
 // use coremidi_sys::MIDIEndpointRef;
 
@@ -25,8 +27,8 @@ impl Ord for MIDIEndpoint {
 }
 
 impl MIDIEndpoint {
-    fn id(&self) -> i64 {
-        todo!()
+    fn id(&self) -> i32 {
+        unsafe { self.i32_property(coremidi_sys::kMIDIPropertyUniqueID) }
     }
 
     pub(crate) fn manufacturer(&self) -> &str {
@@ -39,6 +41,14 @@ impl MIDIEndpoint {
 
     pub(crate) fn display_name(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyDisplayName) }
+    }
+
+    pub(crate) fn kind(&self) -> MIDIPortKind {
+        todo!()
+    }
+
+    pub(crate) fn version(&self) -> u32 {
+        unsafe { self.i32_property(coremidi_sys::kMIDIPropertyDriverVersion) as _ }
     }
 
     pub(crate) fn flush(&self) {
