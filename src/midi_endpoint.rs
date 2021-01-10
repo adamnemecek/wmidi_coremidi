@@ -44,14 +44,20 @@ impl MIDIEndpoint {
     }
 
     fn str_property(&self, property_id: *const core_foundation::string::__CFString) -> &str {
-        // MIDIObjectGetStringProperty(obj: u32, propertyID: *const __CFString, str: *mut *const __CFString) -> i32
-        // coremidi_sys::MIDIObjectGetStringProperty(self.inner, propertyID, str)
-        let s: *mut *const core_foundation::string::__CFString = std::ptr::null_mut();
-        // coremidi_sys::MIDIObjectGetStringProperty(obj, property_id, &mut s);
+        use core_foundation::string::{
+            __CFString,
+            kCFStringEncodingUTF8,
+            CFStringGetCStringPtr,
+            CFStringGetLength,
+        };
+        let s: *mut *const __CFString = std::ptr::null_mut();
 
         unsafe {
-            // std::str::from_utf8_unchecked(&s.as_ref().unwrap())
-        };
-        todo!()
+            coremidi_sys::MIDIObjectGetStringProperty(self.inner, property_id, s);
+            let len = CFStringGetLength(*s);
+            let data = CFStringGetCStringPtr(*s, kCFStringEncodingUTF8) as *const u8;
+            let slice = std::slice::from_raw_parts(data, len as _);
+            std::str::from_utf8(slice).unwrap()
+        }
     }
 }
