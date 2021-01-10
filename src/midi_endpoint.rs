@@ -3,63 +3,91 @@ use crate::prelude::*;
 // use core_foundation::string::__CFString;
 // use coremidi_sys::MIDIEndpointRef;
 
-#[derive(Clone, PartialEq, Eq)]
+
+
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub struct MIDIEndpoint {
-    inner: coremidi_sys::MIDIEndpointRef,
+    inner: std::rc::Rc<MIDIEndpointImpl>
 }
 
 impl MIDIEndpoint {
     pub fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
-        Self { inner }
+        Self { inner: std::rc::Rc::new(MIDIEndpointImpl::new(inner)) }
+    }
+
+    pub fn flush(&self) {
+        todo!()
+    }
+
+    pub fn manufacturer(&self) -> &str {
+        self.inner.manufacturer()
     }
 }
 
-impl std::hash::Hash for MIDIEndpoint {
+#[derive(Clone, PartialEq, Eq)]
+struct MIDIEndpointImpl {
+    inner: coremidi_sys::MIDIEndpointRef,
+}
+
+impl MIDIEndpointImpl {
+    fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
+        Self { inner }
+    }
+
+}
+
+impl std::hash::Hash for MIDIEndpointImpl {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.id().hash(state)
     }
 }
 
-impl PartialOrd for MIDIEndpoint {
+impl PartialOrd for MIDIEndpointImpl {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.id().partial_cmp(&other.id())
     }
 }
 
-impl Ord for MIDIEndpoint {
+impl Ord for MIDIEndpointImpl {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.inner.cmp(&other.inner)
     }
 }
 
-impl MIDIEndpoint {
-    pub fn id(&self) -> i32 {
+impl std::fmt::Debug for MIDIEndpointImpl {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
+    }
+}
+
+impl MIDIEndpointImpl {
+    fn id(&self) -> i32 {
         unsafe { self.i32_property(coremidi_sys::kMIDIPropertyUniqueID) }
     }
 
-    pub fn manufacturer(&self) -> &str {
+    fn manufacturer(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyManufacturer) }
     }
 
-    pub fn name(&self) -> &str {
+    fn name(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyName) }
     }
 
-    pub fn display_name(&self) -> &str {
+    fn display_name(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyDisplayName) }
     }
 
-    pub fn kind(&self) -> MIDIPortKind {
+    fn kind(&self) -> MIDIPortKind {
         // return MIDIPortType(MIDIObjectGetType(id: id))
         // unsafe { coremidi_sys::MIDIObjectGetTy }
         todo!()
     }
 
-    pub fn version(&self) -> u32 {
+    fn version(&self) -> u32 {
         unsafe { self.i32_property(coremidi_sys::kMIDIPropertyDriverVersion) as _ }
     }
 
-    pub fn state(&self) -> MIDIPortDeviceState {
+    fn state(&self) -> MIDIPortDeviceState {
         let v = unsafe { self.i32_property(coremidi_sys::kMIDIPropertyOffline) };
         if v == 0 {
             MIDIPortDeviceState::Connected
@@ -68,7 +96,7 @@ impl MIDIEndpoint {
         }
     }
 
-    pub fn flush(&self) {
+    fn flush(&self) {
         unsafe {
             coremidi_sys::MIDIFlushOutput(self.inner);
         }
