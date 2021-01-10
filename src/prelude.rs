@@ -3,3 +3,5 @@ pub fn os_assert(status: i32) {
         panic!("error: {:?}", status);
     }
 }
+
+pub(crate) use crate::{MIDIClient, MIDIEndpoint};

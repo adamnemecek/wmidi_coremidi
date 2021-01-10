@@ -1,3 +1,5 @@
+pub mod prelude;
+
 mod midi_access;
 pub use midi_access::*;
 
@@ -28,8 +30,8 @@ pub use midi_port_map::*;
 mod midi_timestamp;
 pub use midi_timestamp::*;
 
-mod prelude;
-pub use prelude::*;
+// mod prelude;
+// pub use prelude::*;
 
 mod traits;
 pub use traits::*;

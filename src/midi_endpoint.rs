@@ -1,8 +1,8 @@
-use core_foundation::string::__CFString;
-use coremidi_sys::MIDIEndpointRef;
+// use core_foundation::string::__CFString;
+// use coremidi_sys::MIDIEndpointRef;
 
 #[derive(Clone, PartialEq, Eq)]
-struct MIDIEndpoint {
+pub(crate) struct MIDIEndpoint {
     inner: coremidi_sys::MIDIEndpointRef,
 }
 

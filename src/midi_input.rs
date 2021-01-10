@@ -1,1 +1,5 @@
-pub struct MIDIInput {}
+use crate::prelude::*;
+
+pub struct MIDIInput {
+    // endpoint
+}
