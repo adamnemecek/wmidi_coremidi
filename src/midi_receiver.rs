@@ -10,9 +10,11 @@ pub struct MIDIReceiver {
 unsafe impl Send for MIDIReceiver {}
 impl !Sync for MIDIReceiver {}
 
-
 impl MIDIReceiver {
-    pub(crate) fn new(endpoint: MIDIEndpoint, inner: std::sync::mpsc::Receiver<MIDIPacket>) -> Self {
+    pub(crate) fn new(
+        endpoint: MIDIEndpoint,
+        inner: std::sync::mpsc::Receiver<MIDIPacket>,
+    ) -> Self {
         Self { inner, endpoint }
     }
     pub fn try_recv(&self) -> Result<MIDIPacket, std::sync::mpsc::TryRecvError> {

@@ -1,19 +1,14 @@
 // use coremidi_sys::MIDIPacket;
 
-#[derive(Clone)]
-pub struct MIDIPacket {}
-
-pub struct MIDIPacketList<'a> {
+pub struct MIDIPacketListIterator<'a> {
     count: usize,
     inner: *const coremidi_sys::MIDIPacket,
     ph: std::marker::PhantomData<&'a ()>,
 }
 
-impl<'a> MIDIPacketList<'a> {
+impl<'a> MIDIPacketListIterator<'a> {}
 
-}
-
-impl<'a> Iterator for MIDIPacketList<'a> {
+impl<'a> Iterator for MIDIPacketListIterator<'a> {
     type Item = &'a coremidi_sys::MIDIPacket;
     fn next(&mut self) -> Option<Self::Item> {
         if self.count > 0 {
@@ -28,7 +23,7 @@ impl<'a> Iterator for MIDIPacketList<'a> {
     }
 }
 
-impl<'a> MIDIPacketList<'a> {
+impl<'a> MIDIPacketListIterator<'a> {
     pub(crate) fn new(list: &'a coremidi_sys::MIDIPacketList) -> Self {
         // coremidi_sys::MIDIPacketNext(pkt)
         todo!()

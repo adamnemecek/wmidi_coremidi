@@ -96,8 +96,12 @@ impl MIDIClientImpl {
         // f: impl Fn(crate::MIDIPacket),
     ) -> coremidi_sys::MIDIPortRef {
         let mut out = 0;
-        let block = block::ConcreteBlock::new(move |p: &coremidi_sys::MIDIPacketList| {
-            tx.send(crate::MIDIPacket { });
+        let block = block::ConcreteBlock::new(move |packet: &coremidi_sys::MIDIPacketList| {
+            let mut i = MIDIPacketListIterator::new(packet);
+            for e in i {
+                tx.send(MIDIPacket::from(e));
+            }
+
             // f(p)
             todo!()
         })

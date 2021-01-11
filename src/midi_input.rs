@@ -54,7 +54,7 @@ impl MIDIPort for MIDIInput {
     }
 }
 
-#[derive(Clone, )]
+#[derive(Clone)]
 struct MIDIInputImpl {
     client: MIDIClient,
     endpoint: MIDIEndpoint,
@@ -86,7 +86,7 @@ impl MIDIInputImpl {
     }
 
     // fn receiver(&self) -> MIDIReceiver {
-        
+
     // }
 
     // fn try_recv(&mut self) {

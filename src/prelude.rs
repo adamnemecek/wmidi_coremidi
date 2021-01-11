@@ -14,6 +14,8 @@ pub use crate::{
     MIDIAccess,
     MIDIInput,
     MIDIOutput,
+    MIDIPacket,
+    MIDIPacketListIterator,
     MIDIPort,
     MIDIPortConnectionState,
     MIDIPortDeviceState,

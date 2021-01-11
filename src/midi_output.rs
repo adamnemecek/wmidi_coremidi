@@ -20,8 +20,7 @@ impl MIDIOutput {
         // let hash = crate::hash(&port);
         Self {
             // inner: std::sync::Arc::new(std::sync::Mutex::new(port)),
-            inner
-            // hash,
+            inner, // hash,
         }
     }
 }
