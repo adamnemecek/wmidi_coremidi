@@ -54,11 +54,12 @@ impl MIDIClient {
     pub fn create_input_port(
         &self,
         name: &str,
-        tx: std::sync::mpsc::Sender<crate::MIDIPacket>,
+        tx: std::sync::mpsc::Sender<MIDIPacket>,
         // f: impl Fn(crate::MIDIPacket),
     ) -> coremidi_sys::MIDIPortRef {
+        self.inner.lock().unwrap().create_input_port(name, tx)
         // self.inner.lock().unwrap().create_input_port(name, f)
-        todo!()
+        // todo!()
     }
 
     pub fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
@@ -92,18 +93,15 @@ impl MIDIClientImpl {
     fn create_input_port(
         &self,
         name: &str,
-        tx: std::sync::mpsc::Sender<crate::MIDIPacket>,
+        tx: std::sync::mpsc::Sender<MIDIPacket>,
         // f: impl Fn(crate::MIDIPacket),
     ) -> coremidi_sys::MIDIPortRef {
         let mut out = 0;
         let block = block::ConcreteBlock::new(move |packet: &coremidi_sys::MIDIPacketList| {
-            let mut i = MIDIPacketListIterator::new(packet);
+            let i = MIDIPacketListIterator::new(packet);
             for e in i {
-                tx.send(MIDIPacket::from(e));
+                let _ = tx.send(MIDIPacket::from(e));
             }
-
-            // f(p)
-            todo!()
         })
         .copy();
 
