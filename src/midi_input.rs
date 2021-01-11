@@ -98,9 +98,11 @@ impl MIDIInputImpl {
     fn receiver(&self) -> MIDIReceiver {
         // if self.
         let (tx, rx) = std::sync::mpsc::channel();
-        self.client.create_input_port("port", |packet| {
-            tx.send(packet);
-        });
+        // self.client.create_input_port("port", |packet| {
+        //     tx.send(packet);
+        // });
+        self.client.create_input_port("port", tx);
+
         MIDIReceiver::new(self.endpoint.clone(), rx)
 
         // self.receiver = Some(rx);
