@@ -15,6 +15,8 @@ fn main() {
     let access = MIDIAccess::new("example");
 
     for (k, v) in access.outputs().iter() {
-        println!("{} {}", k, v);
+        let sender = v.sender();
+        break;
+        // println!("{} {}", k, v);
     }
 }
