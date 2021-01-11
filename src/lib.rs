@@ -18,6 +18,9 @@ pub use midi_output::*;
 mod midi_packet;
 pub use midi_packet::*;
 
+mod midi_receiver;
+pub use midi_receiver::*;
+
 mod midi_packet_list;
 pub use midi_packet_list::*;
 

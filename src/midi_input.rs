@@ -4,18 +4,36 @@ use crate::prelude::*;
 
 type MIDIReadBlock = block::Block<(*const coremidi_sys::MIDIPacketList, std::ffi::c_void), ()>;
 
-#[derive(Clone, PartialEq, Eq)]
+pub type MIDIReceiver = std::sync::mpsc::Receiver<crate::MIDIPacket>;
+
+#[derive(Clone)]
 pub struct MIDIInput {
-    inner: std::rc::Rc<std::cell::RefCell<MIDIInputImpl>>,
+    inner: std::sync::Arc<std::sync::Mutex<MIDIInputImpl>>,
+    hash: u64,
+
 }
+
+impl PartialEq for MIDIInput {
+    fn eq(&self, other: &Self) -> bool {
+        self.hash == other.hash
+    }
+}
+
+impl Eq for MIDIInput {}
+
 
 impl MIDIInput {
     pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+        let inner = MIDIInputImpl::new(client, endpoint);
+        let hash = crate::hash(&inner);
         Self {
-            inner: std::rc::Rc::new(std::cell::RefCell::new(MIDIInputImpl::new(
-                client, endpoint,
-            ))),
+            inner: std::sync::Arc::new(std::sync::Mutex::new(inner)),
+            hash,
         }
+    }
+
+    pub fn set_midi_message_receiver(&mut self, rx: MIDIReceiver) {
+
     }
 }
 
@@ -33,26 +51,43 @@ impl std::hash::Hash for MIDIInput {
 
 impl MIDIPort for MIDIInput {
     fn id(&self) -> MIDIPortID {
-        self.inner.borrow().id()
+        self.inner.lock().unwrap().id()
     }
 }
 
-#[derive(Clone, PartialEq, Eq)]
+// #[derive(Clone, )]
 struct MIDIInputImpl {
     client: MIDIClient,
     endpoint: MIDIEndpoint,
+    receiver: Option<std::sync::mpsc::Receiver<crate::MIDIPacket>>,
 }
+
+impl PartialEq for MIDIInputImpl {
+    fn eq(&self, other: &Self) -> bool {
+        self.endpoint == other.endpoint
+    }
+}
+
+impl Eq for MIDIInputImpl { }
 
 impl MIDIInputImpl {
     fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
-        Self { client, endpoint }
+        Self { client, endpoint, receiver: None }
     }
 
     fn id(&self) -> MIDIPortID {
         self.endpoint.id()
     }
 
-    fn open(&self) {
+    fn open(&mut self) {
+        // if self.
+        let (tx, rx) = std::sync::mpsc::channel();
+        self.client.create_input_port("port", |packet| { 
+            tx.send(packet);
+        });
+
+        self.receiver = Some(rx);
+
         // let `self` = self as! MIDIInput
         // ref = MIDIInputPortCreate(ref: client.ref) {
         //     `self`.onMIDIMessage?($0)

@@ -14,7 +14,7 @@ use crate::prelude::*;
 //     }
 // }
 
-fn hash<T: std::hash::Hash>(v: &T) -> u64 {
+pub(crate) fn hash<T: std::hash::Hash>(v: &T) -> u64 {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::Hasher;
     let mut s = DefaultHasher::new();
@@ -38,18 +38,14 @@ impl Eq for MIDIClient {}
 // input_observer: Option<std::sync::Arc<std::sync::Mutex<Box<dyn MIDIInputObserver>>>>,
 
 impl MIDIClient {
-    pub fn new(name: &str) -> Self {
-        let (tx, rx) = std::sync::mpsc::channel();
+    pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
+        // let (tx, rx) = std::sync::mpsc::channel();
 
         let client = MIDIClientImpl::new(name, tx);
         let hash = hash(&client);
         let inner = std::sync::Arc::new(std::sync::Mutex::new(client));
         let clone = inner.clone();
         // let self_ = Self { inner, hash };
-        std::thread::spawn(move || {
-            let d = rx.recv().unwrap();
-            clone.lock().unwrap().notification(d);
-        });
 
         // self_
         Self { inner, hash }
@@ -58,7 +54,7 @@ impl MIDIClient {
     pub fn create_input_port(
         &self,
         name: &str,
-        f: impl Fn(&coremidi_sys::MIDIPacketList) + 'static,
+        f: impl Fn(crate::MIDIPacket) ,
     ) -> coremidi_sys::MIDIPortRef {
         self.inner.lock().unwrap().create_input_port(name, f)
     }
@@ -94,10 +90,13 @@ impl MIDIClientImpl {
     fn create_input_port(
         &self,
         name: &str,
-        f: impl Fn(&coremidi_sys::MIDIPacketList) + 'static,
+        f: impl Fn(crate::MIDIPacket) ,
     ) -> coremidi_sys::MIDIPortRef {
         let mut out = 0;
-        let block = block::ConcreteBlock::new(move |p: &coremidi_sys::MIDIPacketList| f(p)).copy();
+        let block = block::ConcreteBlock::new(move |p: &coremidi_sys::MIDIPacketList| {
+            // f(p)
+            todo!()
+        }).copy();
 
         unsafe {
             use core_foundation::base::TCFType;

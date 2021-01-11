@@ -1,16 +1,26 @@
 use crate::prelude::*;
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone)]
 pub struct MIDIOutput {
-    inner: std::rc::Rc<std::cell::RefCell<MIDIOutputImpl>>,
+    inner: std::sync::Arc<std::sync::Mutex<MIDIOutputImpl>>,
+    hash: u64,
 }
+
+impl PartialEq for MIDIOutput {
+    fn eq(&self, other: &Self) -> bool {
+        self.hash == other.hash
+    }
+}
+
+impl Eq for MIDIOutput {}
 
 impl MIDIOutput {
     pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+        let port = MIDIOutputImpl::new(client, endpoint);
+        let hash = crate::hash(&port);
         Self {
-            inner: std::rc::Rc::new(std::cell::RefCell::new(MIDIOutputImpl::new(
-                client, endpoint,
-            ))),
+            inner: std::sync::Arc::new(std::sync::Mutex::new(port)),
+            hash,
         }
     }
 }
@@ -18,27 +28,27 @@ impl MIDIOutput {
 impl MIDIPort for MIDIOutput {
     fn id(&self) -> MIDIPortID {
         // MIDIPortID::new(self.inner.borrow().id())
-        self.inner.borrow().id()
+        self.inner.lock().unwrap().id()
     }
 }
 
 impl MIDIOutput {
     fn open(&mut self) {
-        self.inner.borrow_mut().open();
+        self.inner.lock().unwrap().open();
     }
 
     fn close(&mut self) {
-        self.inner.borrow_mut().close();
+        self.inner.lock().unwrap().close();
     }
 
     fn connection(&self) -> MIDIPortConnectionState {
-        self.inner.borrow().connection()
+        self.inner.lock().unwrap().connection()
     }
 }
 
 impl std::fmt::Display for MIDIOutput {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.inner.borrow().fmt(f)
+        self.inner.lock().unwrap().fmt(f)
     }
 }
 
@@ -50,7 +60,7 @@ impl std::fmt::Debug for MIDIOutput {
 
 impl std::hash::Hash for MIDIOutput {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.inner.borrow().hash(state);
+        self.inner.lock().unwrap().hash(state);
     }
 }
 

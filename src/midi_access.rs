@@ -4,22 +4,31 @@ use crate::{
 };
 
 pub struct MIDIAccess {
-    inner: std::rc::Rc<MIDIAccessImpl>,
+    // inner: std::rc::Rc<MIDIAccessImpl>,
+    inner: std::sync::Arc<std::sync::Mutex<MIDIAccessImpl>>,
 }
 
 impl MIDIAccess {
     pub fn new(name: &str) -> Self {
-        Self {
-            inner: std::rc::Rc::new(MIDIAccessImpl::new(name)),
-        }
+        let (tx, rx) = std::sync::mpsc::channel();
+
+        let inner = std::sync::Arc::new(std::sync::Mutex::new(MIDIAccessImpl::new(name, tx)));
+        let clone = inner.clone();
+        std::thread::spawn(move || {
+            let d = rx.recv().unwrap();
+            clone.lock().unwrap().notification(d);
+        });
+        Self { inner }
     }
 
     pub fn inputs(&self) -> &MIDIPortMap<MIDIInput> {
-        self.inner.inputs()
+        // self.inner.lock().unwrap().inputs()
+        todo!()
     }
 
-    pub fn outputs(&self) -> &MIDIPortMap<MIDIOutput> {
-        self.inner.outputs()
+    pub fn outputs<'a>(&'a self) -> &'a MIDIPortMap<MIDIOutput> {
+        // self.inner.lock().unwrap().outputs()
+        todo!()
     }
 }
 
@@ -30,8 +39,9 @@ struct MIDIAccessImpl {
 }
 
 impl MIDIAccessImpl {
-    pub fn new(name: &str) -> Self {
-        let client = MIDIClient::new(name);
+    fn notification(&mut self, u: u32) {}
+    pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
+        let client = MIDIClient::new(name, tx);
         let inputs = MIDIPortMap::<MIDIInput>::new(&client);
         let outputs = MIDIPortMap::<MIDIOutput>::new(&client);
 
