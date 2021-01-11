@@ -85,23 +85,14 @@ impl MIDIInputImpl {
         self.endpoint.id()
     }
 
-    // fn receiver(&self) -> MIDIReceiver {
-
-    // }
-
-    // fn try_recv(&mut self) {
-    //     self.open();
-    //     let recv = self.receiver.as_ref().unwrap();
-    //     recv.try_recv();
-    // }
-
-    fn receiver(&self) -> MIDIReceiver {
+    pub fn receiver(&self) -> MIDIReceiver {
         // if self.
         let (tx, rx) = std::sync::mpsc::channel();
         // self.client.create_input_port("port", |packet| {
         //     tx.send(packet);
         // });
-        self.client.create_input_port("port", tx);
+        let name = format!("MIDIReceiver{}", self.endpoint.display_name());
+        self.client.create_input_port(&name, tx);
 
         MIDIReceiver::new(self.endpoint.clone(), rx)
 

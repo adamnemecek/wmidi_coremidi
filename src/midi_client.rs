@@ -51,7 +51,7 @@ impl MIDIClient {
         Self { inner, hash }
     }
 
-    pub fn create_input_port(
+    pub(crate) fn create_input_port(
         &self,
         name: &str,
         tx: std::sync::mpsc::Sender<MIDIPacket>,
@@ -62,7 +62,7 @@ impl MIDIClient {
         // todo!()
     }
 
-    pub fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
+    pub(crate) fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
         self.inner.lock().unwrap().create_output_port(name)
     }
 }
@@ -82,7 +82,9 @@ impl MIDIClientImpl {
     //     }
     // }
 
-    fn notification(&mut self, u: u32) {}
+    fn notification(&mut self, u: u32) {
+
+    }
 
     fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
         Self {
