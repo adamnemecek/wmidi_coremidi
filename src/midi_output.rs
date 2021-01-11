@@ -112,6 +112,11 @@ impl MIDIOutputImpl {
         }
     }
 
+    fn sender(&self) -> MIDISender {
+        let port = self.client.create_output_port("");
+        MIDISender::new(&self.client, self.endpoint.clone(), port)
+    }
+
     fn open(&mut self) {
         if self.connection() == MIDIPortConnectionState::Open {
             return;

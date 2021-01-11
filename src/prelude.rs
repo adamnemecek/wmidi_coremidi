@@ -20,4 +20,6 @@ pub use crate::{
     MIDIPortID,
     MIDIPortKind,
     MIDIPortMap,
+    MIDIReceiver,
+    MIDISender,
 };

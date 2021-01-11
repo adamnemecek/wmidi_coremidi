@@ -37,6 +37,10 @@ pub struct MIDIEndpoint {
 }
 
 impl MIDIEndpoint {
+    pub(crate) fn inner(&self) -> coremidi_sys::MIDIEndpointRef {
+        todo!()
+    }
+
     pub fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
         Self {
             inner: std::sync::Arc::new(MIDIEndpointImpl::new(inner)),

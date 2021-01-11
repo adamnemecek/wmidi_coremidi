@@ -54,7 +54,7 @@ impl MIDIClient {
     pub fn create_input_port(
         &self,
         name: &str,
-        f: impl Fn(crate::MIDIPacket) ,
+        f: impl Fn(crate::MIDIPacket),
     ) -> coremidi_sys::MIDIPortRef {
         self.inner.lock().unwrap().create_input_port(name, f)
     }
@@ -90,13 +90,14 @@ impl MIDIClientImpl {
     fn create_input_port(
         &self,
         name: &str,
-        f: impl Fn(crate::MIDIPacket) ,
+        f: impl Fn(crate::MIDIPacket),
     ) -> coremidi_sys::MIDIPortRef {
         let mut out = 0;
         let block = block::ConcreteBlock::new(move |p: &coremidi_sys::MIDIPacketList| {
             // f(p)
             todo!()
-        }).copy();
+        })
+        .copy();
 
         unsafe {
             use core_foundation::base::TCFType;

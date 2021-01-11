@@ -1,3 +1,5 @@
+#![feature(negative_impls)]
+
 pub mod prelude;
 
 mod midi_access;
@@ -15,11 +17,17 @@ pub use midi_input::*;
 mod midi_output;
 pub use midi_output::*;
 
+mod midi_channel;
+pub use midi_channel::*;
+
 mod midi_packet;
 pub use midi_packet::*;
 
 mod midi_receiver;
 pub use midi_receiver::*;
+
+mod midi_sender;
+pub use midi_sender::*;
 
 mod midi_packet_list;
 pub use midi_packet_list::*;

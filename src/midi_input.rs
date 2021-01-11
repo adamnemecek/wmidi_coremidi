@@ -4,13 +4,10 @@ use crate::prelude::*;
 
 type MIDIReadBlock = block::Block<(*const coremidi_sys::MIDIPacketList, std::ffi::c_void), ()>;
 
-pub type MIDIReceiver = std::sync::mpsc::Receiver<crate::MIDIPacket>;
-
 #[derive(Clone)]
 pub struct MIDIInput {
     inner: std::sync::Arc<std::sync::Mutex<MIDIInputImpl>>,
     hash: u64,
-
 }
 
 impl PartialEq for MIDIInput {
@@ -20,7 +17,6 @@ impl PartialEq for MIDIInput {
 }
 
 impl Eq for MIDIInput {}
-
 
 impl MIDIInput {
     pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
@@ -32,9 +28,7 @@ impl MIDIInput {
         }
     }
 
-    pub fn set_midi_message_receiver(&mut self, rx: MIDIReceiver) {
-
-    }
+    pub fn set_midi_message_receiver(&mut self, rx: MIDIReceiver) {}
 }
 
 impl std::fmt::Debug for MIDIInput {
@@ -61,6 +55,9 @@ struct MIDIInputImpl {
     endpoint: MIDIEndpoint,
     receiver: Option<std::sync::mpsc::Receiver<crate::MIDIPacket>>,
 }
+// analogous to
+
+unsafe impl Send for MIDIInputImpl {}
 
 impl PartialEq for MIDIInputImpl {
     fn eq(&self, other: &Self) -> bool {
@@ -68,21 +65,31 @@ impl PartialEq for MIDIInputImpl {
     }
 }
 
-impl Eq for MIDIInputImpl { }
+impl Eq for MIDIInputImpl {}
 
 impl MIDIInputImpl {
     fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
-        Self { client, endpoint, receiver: None }
+        Self {
+            client,
+            endpoint,
+            receiver: None,
+        }
     }
 
     fn id(&self) -> MIDIPortID {
         self.endpoint.id()
     }
 
+    fn try_recv(&mut self) {
+        self.open();
+        let recv = self.receiver.as_ref().unwrap();
+        recv.try_recv();
+    }
+
     fn open(&mut self) {
         // if self.
         let (tx, rx) = std::sync::mpsc::channel();
-        self.client.create_input_port("port", |packet| { 
+        self.client.create_input_port("port", |packet| {
             tx.send(packet);
         });
 
@@ -94,6 +101,11 @@ impl MIDIInputImpl {
         // }
 
         // OSAssert(MIDIPortConnectSource(ref, endpoint.ref, nil))
+    }
+
+    fn close(&mut self) {
+        //
+        self.receiver = None;
     }
 }
 
