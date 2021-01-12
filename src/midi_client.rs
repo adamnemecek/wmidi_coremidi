@@ -23,6 +23,7 @@ pub(crate) fn hash<T: std::hash::Hash>(v: &T) -> u64 {
 }
 
 #[derive(Clone)]
+// needs to be arc so that it
 pub(crate) struct MIDIClient {
     inner: std::sync::Arc<std::sync::Mutex<MIDIClientImpl>>,
     hash: u64,
@@ -38,17 +39,25 @@ impl Eq for MIDIClient {}
 // input_observer: Option<std::sync::Arc<std::sync::Mutex<Box<dyn MIDIInputObserver>>>>,
 
 impl MIDIClient {
+    pub fn notification(&mut self, u: u32) {
+        self.inner.lock().unwrap().notification(u);
+    }
+
     pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
-        // let (tx, rx) = std::sync::mpsc::channel();
+        let (tx, rx) = std::sync::mpsc::channel();
 
         let client = MIDIClientImpl::new(name, tx);
         let hash = hash(&client);
         let inner = std::sync::Arc::new(std::sync::Mutex::new(client));
-        let clone = inner.clone();
-        // let self_ = Self { inner, hash };
+        // let clone = inner.clone();
+        let self_ = Self { inner, hash };
+        let mut clone = self_.clone();
+        std::thread::spawn(move || {
+            let v = rx.recv().unwrap();
+            clone.notification(v);
+        });
 
-        // self_
-        Self { inner, hash }
+        self_
     }
 
     pub(crate) fn create_input_port(
@@ -82,9 +91,7 @@ impl MIDIClientImpl {
     //     }
     // }
 
-    fn notification(&mut self, u: u32) {
-
-    }
+    fn notification(&mut self, u: u32) {}
 
     fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
         Self {
@@ -123,12 +130,14 @@ impl MIDIClientImpl {
 
     fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
         let mut out = 0;
-        let name = core_foundation::string::CFString::new(name);
         unsafe {
-            // os_assert(coremidi_sys::MIDIOutputPortCreate(
-            //     self.inner, name.as_mut_ptr(), &mut out,
-            // ));
-            todo!();
+            use core_foundation::base::TCFType;
+            let name = core_foundation::string::CFString::new(name);
+            os_assert(coremidi_sys::MIDIOutputPortCreate(
+                self.inner,
+                name.as_concrete_TypeRef(),
+                &mut out,
+            ));
         }
         out
     }
