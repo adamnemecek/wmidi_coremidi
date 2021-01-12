@@ -29,10 +29,9 @@ impl MIDIInput {
         }
     }
 
-    // pub fn set_midi_message_receiver(&mut self, rx: MIDIReceiver) {}
-    // pub fn receiver(&self) -> MIDIReceiver {
-    //     MIDIReceiver::new()
-    // }
+    pub fn receiver(&self) -> MIDIReceiver {
+        self.inner.receiver()
+    }
 }
 
 impl std::fmt::Debug for MIDIInput {

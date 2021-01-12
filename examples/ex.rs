@@ -13,12 +13,31 @@ fn main() {
     // println!("{:?} {:?}", a, b);
 
     let access = MIDIAccess::new("example");
+    // let v = vec![1,2,3];
+    // access.outputs().iter().first
+    let mut sender = access
+        .outputs()
+        .iter()
+        .next()
+        .map(|x| x.1.sender())
+        .unwrap();
+    let mut recv = access
+        .inputs()
+        .iter()
+        .next()
+        .map(|x| x.1.receiver())
+        .unwrap();
 
-    for (k, v) in access.outputs().iter() {
+    // sender.send()
+    // for (k, v) in access.outputs().iter() {
+    //     sender = Some(v.sender());
+    //     break;
+    // }
 
-        // let sender = v.sender();
-        // println!("")
-        // break;
-        // println!("{} {}", k, v);
-    }
+    // let a = access.inputs().iter().first();
+    // let mut recv = None;
+    // for (k, v) in access.inputs().iter() {
+    //     recv = Some(v.receiver());
+    //     break;
+    // }
 }
