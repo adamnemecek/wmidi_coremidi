@@ -1,6 +1,7 @@
 const PACKET_DATA_SIZE: usize = 256;
 
 // #[derive(Default)]
+
 pub struct MIDIPacket {
     timestamp: u64,
     len: usize,
@@ -14,6 +15,17 @@ impl Default for MIDIPacket {
             timestamp: 0,
             data: [0; PACKET_DATA_SIZE],
         }
+    }
+}
+
+impl std::fmt::Debug for MIDIPacket {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "MIDIPacket {{ timestamp: {}, data: {:?} }}",
+            self.timestamp,
+            self.as_slice()
+        )
     }
 }
 
@@ -54,7 +66,7 @@ impl MIDIPacket {
         self.len
     }
 
-    pub fn slice(&self) -> &[u8] {
+    pub fn as_slice(&self) -> &[u8] {
         unsafe { std::slice::from_raw_parts(&self.data as *const _, self.len) }
     }
 

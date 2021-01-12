@@ -11,7 +11,7 @@ fn main() {
     // let b = "two";
 
     // println!("{:?} {:?}", a, b);
-    if false {
+    if true {
         let access = MIDIAccess::new("example");
         // let v = vec![1,2,3];
         // access.outputs().iter().first
@@ -27,10 +27,16 @@ fn main() {
             .next()
             .map(|x| x.1.receiver())
             .unwrap();
+        std::thread::spawn(move || {
+            let packet = recv.try_recv().unwrap();
+            println!("midipacket: {:?}", packet);
+        });
 
-        sender.send(&MIDIPacket::new(0, &[0x80, 0x80, 0x80]));
-
-        let res = recv.try_recv();
+        // println!("here");
+        // sender.send(&MIDIPacket::new(0, &[0x80, 0x80, 0x80]));
+        sender.send(0, &[0x80, 0x80, 0x00]);
+        std::thread::sleep(std::time::Duration::from_secs(10));
+        // let res = recv.try_recv();
     }
 
     // let nanos = wmidi_coremidi::current_host_time();

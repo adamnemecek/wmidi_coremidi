@@ -11,8 +11,6 @@ pub struct MIDISender {
 unsafe impl Send for MIDISender {}
 impl !Sync for MIDISender {}
 
-
-
 #[inline]
 #[allow(non_snake_case)]
 fn CreateMIDIPacket(timestamp: u64, data: &[u8]) -> coremidi_sys::MIDIPacket {
@@ -23,7 +21,10 @@ fn CreateMIDIPacket(timestamp: u64, data: &[u8]) -> coremidi_sys::MIDIPacket {
         __padding: [0; 2],
     };
 
-    self_.data.copy_from_slice(data);
+    // self_.data.copy_from_slice(data);
+    unsafe {
+        std::ptr::copy_nonoverlapping(data.as_ptr(), self_.data.as_mut_ptr(), data.len());
+    }
     self_.length = data.len() as _;
     self_.timeStamp = timestamp;
     self_
@@ -35,10 +36,9 @@ fn CreateMIDIPacketList(timestamp: u64, data: &[u8]) -> coremidi_sys::MIDIPacket
     let packet = CreateMIDIPacket(timestamp, data);
     coremidi_sys::MIDIPacketList {
         numPackets: 1,
-        packet: [packet]
+        packet: [packet],
     }
 }
-
 
 impl MIDISender {
     pub(crate) fn new(
