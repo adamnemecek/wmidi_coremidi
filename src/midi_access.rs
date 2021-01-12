@@ -23,12 +23,10 @@ impl MIDIAccess {
 
     pub fn inputs(&self) -> MIDIPortMap<MIDIInput> {
         self.inner.lock().unwrap().inputs()
-        // todo!()
     }
 
     pub fn outputs(&self) -> MIDIPortMap<MIDIOutput> {
         self.inner.lock().unwrap().outputs()
-        // todo!()
     }
 }
 
@@ -40,6 +38,7 @@ struct MIDIAccessImpl {
 
 impl MIDIAccessImpl {
     fn notification(&mut self, u: u32) {}
+
     pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
         let client = MIDIClient::new(name, tx);
         let inputs = MIDIPortMap::<MIDIInput>::new(&client);

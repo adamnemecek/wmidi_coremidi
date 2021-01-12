@@ -40,6 +40,19 @@ impl MIDIPortMap<MIDIOutput> {
     }
 }
 
+impl<T: MIDIPort> std::ops::Index<MIDIPortID> for MIDIPortMap<T> {
+    type Output = T;
+    fn index(&self, index: MIDIPortID) -> &T {
+        &self.inner[index]
+    }
+}
+
+// impl<T: MIDIPort> std::ops::IndexMut<MIDIPortID> for MIDIPortMap<T> {
+//     fn index_mut(&mut self, index: MIDIPortID) -> &mut T {
+//         self.inner.get_mut(&index).unwrap()
+//     }
+// }
+
 pub struct MIDIPortMapImpl<T: MIDIPort> {
     inner: std::collections::HashMap<MIDIPortID, T>,
 }
