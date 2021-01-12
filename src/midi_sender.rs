@@ -11,6 +11,35 @@ pub struct MIDISender {
 unsafe impl Send for MIDISender {}
 impl !Sync for MIDISender {}
 
+
+
+#[inline]
+#[allow(non_snake_case)]
+fn CreateMIDIPacket(timestamp: u64, data: &[u8]) -> coremidi_sys::MIDIPacket {
+    let mut self_ = coremidi_sys::MIDIPacket {
+        length: 0,
+        timeStamp: 0,
+        data: [0; 256],
+        __padding: [0; 2],
+    };
+
+    self_.data.copy_from_slice(data);
+    self_.length = data.len() as _;
+    self_.timeStamp = timestamp;
+    self_
+}
+
+#[inline]
+#[allow(non_snake_case)]
+fn CreateMIDIPacketList(timestamp: u64, data: &[u8]) -> coremidi_sys::MIDIPacketList {
+    let packet = CreateMIDIPacket(timestamp, data);
+    coremidi_sys::MIDIPacketList {
+        numPackets: 1,
+        packet: [packet]
+    }
+}
+
+
 impl MIDISender {
     pub(crate) fn new(
         client: &MIDIClient,
@@ -23,16 +52,26 @@ impl MIDISender {
     }
     // pub fn n
 
-    pub fn send(&self, t: &MIDIPacket) -> Result<(), std::sync::mpsc::SendError<MIDIPacket>> {
-        let z = coremidi_sys::MIDIPacket {
-            length: 0,
-            timeStamp: 0,
-            data: [0; 256],
-            __padding: [0; 2],
-        };
+    //todo: what's that into pattern
+    pub fn send(&self, timestamp: impl Into<Option<u64>>, data: &[u8]) {
+        let timestamp = timestamp.into().unwrap_or(0);
+        let list = CreateMIDIPacketList(timestamp, data);
+
         unsafe {
-            coremidi_sys::MIDISend(self.port, self.endpoint.inner(), std::ptr::null());
+            coremidi_sys::MIDISend(self.port, self.endpoint.inner(), &list);
         }
-        todo!()
     }
+
+    // pub fn send(&self, t: &MIDIPacket) -> Result<(), std::sync::mpsc::SendError<MIDIPacket>> {
+    //     let z = coremidi_sys::MIDIPacket {
+    //         length: 0,
+    //         timeStamp: 0,
+    //         data: [0; 256],
+    //         __padding: [0; 2],
+    //     };
+    //     unsafe {
+    //         coremidi_sys::MIDISend(self.port, self.endpoint.inner(), std::ptr::null());
+    //     }
+    //     todo!()
+    // }
 }
