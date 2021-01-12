@@ -67,6 +67,8 @@ impl MIDISender {
                 self.endpoint.inner(),
                 &list,
             ));
+
+            // os_assert(coremidi_sys::MIDIReceived(self.port, &list));
         }
     }
 

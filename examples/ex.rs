@@ -20,7 +20,10 @@ fn main() {
         // }
         let outputs = access.outputs();
 
-        let port = outputs.iter().find(|x| !x.1.manufacturer().contains("Snoize")).unwrap();
+        let port = outputs
+            .iter()
+            .find(|x| !x.1.manufacturer().contains("Snoize"))
+            .unwrap();
 
         // println!("here");
         println!("output manufacturer {:?}", port.1.manufacturer());
@@ -38,9 +41,16 @@ fn main() {
 
         println!("recv name {}", recv.display_name());
         std::thread::spawn(move || {
-            println!("here");
-            let packet = recv.recv().unwrap();
-            println!("midipacket: {:?}", packet);
+            println!("spawn ");
+            match recv.recv() {
+                Ok(packet) => {
+                    println!("midipacket: {:?}", packet);
+                }
+                Err(e) => {
+                    println!("error {:?}", e);
+                }
+            }
+            
         });
 
         // println!("here");
