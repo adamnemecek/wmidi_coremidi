@@ -169,6 +169,7 @@ fn MIDIClientCreate(name: &str, tx: std::sync::mpsc::Sender<u32>) -> coremidi_sy
         use core_foundation::base::TCFType;
         let block = block::ConcreteBlock::new(move |notification: u32| {
             tx.send(10);
+            todo!();
         })
         .copy();
         let name = core_foundation::string::CFString::new(name);

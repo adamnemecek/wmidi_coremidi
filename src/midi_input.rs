@@ -49,8 +49,8 @@ impl std::hash::Hash for MIDIInput {
 
 impl MIDIPort for MIDIInput {
     fn id(&self) -> MIDIPortID {
-        // self.inner.lock().unwrap().id()
-        todo!()
+        self.inner.id()
+        // todo!()
     }
 }
 
