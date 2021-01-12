@@ -17,7 +17,13 @@ impl MIDIReceiver {
     ) -> Self {
         Self { inner, endpoint }
     }
+
+    // doesn't block
     pub fn try_recv(&self) -> Result<MIDIPacket, std::sync::mpsc::TryRecvError> {
         self.inner.try_recv()
+    }
+
+    pub fn recv(&self) -> Result<MIDIPacket, std::sync::mpsc::RecvError> {
+        self.inner.recv()
     }
 }

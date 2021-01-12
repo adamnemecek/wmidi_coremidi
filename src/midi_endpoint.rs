@@ -38,7 +38,7 @@ pub struct MIDIEndpoint {
 
 impl MIDIEndpoint {
     pub(crate) fn inner(&self) -> coremidi_sys::MIDIEndpointRef {
-        todo!()
+        self.inner.inner()
     }
 
     pub fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
@@ -70,6 +70,9 @@ struct MIDIEndpointImpl {
 }
 
 impl MIDIEndpointImpl {
+    fn inner(&self) -> coremidi_sys::MIDIEndpointRef {
+        self.inner
+    }
     fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
         Self { inner }
     }

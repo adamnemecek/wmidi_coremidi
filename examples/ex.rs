@@ -28,14 +28,15 @@ fn main() {
             .map(|x| x.1.receiver())
             .unwrap();
         std::thread::spawn(move || {
-            let packet = recv.try_recv().unwrap();
+            println!("here");
+            let packet = recv.recv().unwrap();
             println!("midipacket: {:?}", packet);
         });
 
         // println!("here");
         // sender.send(&MIDIPacket::new(0, &[0x80, 0x80, 0x80]));
         sender.send(0, &[0x80, 0x80, 0x00]);
-        std::thread::sleep(std::time::Duration::from_secs(10));
+        std::thread::sleep(std::time::Duration::from_secs(2));
         // let res = recv.try_recv();
     }
 
