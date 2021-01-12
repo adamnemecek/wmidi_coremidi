@@ -1,11 +1,11 @@
 use wmidi_coremidi::prelude::*;
 
 fn main() {
-    let i = wmidi_coremidi::MIDISourceIterator::new();
+    // let i = wmidi_coremidi::MIDISourceIterator::new();
 
-    for e in i {
-        println!("endpoint {:?}", e.manufacturer());
-    }
+    // for e in i {
+    //     println!("endpoint {:?}", e.manufacturer());
+    // }
 
     // let a = "one";
     // let b = "two";
@@ -15,8 +15,10 @@ fn main() {
     let access = MIDIAccess::new("example");
 
     for (k, v) in access.outputs().iter() {
-        let sender = v.sender();
-        break;
+
+        // let sender = v.sender();
+        // println!("")
+        // break;
         // println!("{} {}", k, v);
     }
 }

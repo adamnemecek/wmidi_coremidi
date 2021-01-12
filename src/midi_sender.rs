@@ -18,7 +18,8 @@ impl MIDISender {
         port: coremidi_sys::MIDIPortRef,
     ) -> Self {
         // Self { inner }
-        todo!()
+        // todo!()
+        Self { endpoint, port }
     }
     // pub fn n
 

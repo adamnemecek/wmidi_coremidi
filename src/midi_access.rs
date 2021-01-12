@@ -13,22 +13,22 @@ impl MIDIAccess {
         let (tx, rx) = std::sync::mpsc::channel();
 
         let inner = std::sync::Arc::new(std::sync::Mutex::new(MIDIAccessImpl::new(name, tx)));
-        let clone = inner.clone();
-        std::thread::spawn(move || {
-            let d = rx.recv().unwrap();
-            clone.lock().unwrap().notification(d);
-        });
+        // let clone = inner.clone();
+        // std::thread::spawn(move || {
+        //     let d = rx.recv().unwrap();
+        //     clone.lock().unwrap().notification(d);
+        // });
         Self { inner }
     }
 
-    pub fn inputs(&self) -> &MIDIPortMap<MIDIInput> {
-        // self.inner.lock().unwrap().inputs()
-        todo!()
+    pub fn inputs(&self) -> MIDIPortMap<MIDIInput> {
+        self.inner.lock().unwrap().inputs()
+        // todo!()
     }
 
-    pub fn outputs<'a>(&'a self) -> &'a MIDIPortMap<MIDIOutput> {
-        // self.inner.lock().unwrap().outputs()
-        todo!()
+    pub fn outputs(&self) -> MIDIPortMap<MIDIOutput> {
+        self.inner.lock().unwrap().outputs()
+        // todo!()
     }
 }
 
@@ -52,11 +52,11 @@ impl MIDIAccessImpl {
         }
     }
 
-    pub fn inputs(&self) -> &MIDIPortMap<MIDIInput> {
-        &self.inputs
+    pub fn inputs(&self) -> MIDIPortMap<MIDIInput> {
+        self.inputs.clone()
     }
 
-    pub fn outputs(&self) -> &MIDIPortMap<MIDIOutput> {
-        &self.outputs
+    pub fn outputs(&self) -> MIDIPortMap<MIDIOutput> {
+        self.outputs.clone()
     }
 }
