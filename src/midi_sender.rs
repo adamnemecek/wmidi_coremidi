@@ -1,6 +1,6 @@
 // similar to std::sync::mpsc::Receiver
 use crate::prelude::*;
-use crate::MIDIPacket;
+// use crate::MIDIPacket;
 
 pub struct MIDISender {
     // inner: std::sync::mpsc::Sender<MIDIPacket>,
@@ -24,6 +24,12 @@ impl MIDISender {
     // pub fn n
 
     pub fn send(&self, t: &MIDIPacket) -> Result<(), std::sync::mpsc::SendError<MIDIPacket>> {
+        let z = coremidi_sys::MIDIPacket {
+            length: 0,
+            timeStamp: 0,
+            data: [0; 256],
+            __padding: [0; 2],
+        };
         unsafe {
             coremidi_sys::MIDISend(self.port, self.endpoint.inner(), std::ptr::null());
         }
