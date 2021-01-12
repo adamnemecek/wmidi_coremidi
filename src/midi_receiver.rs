@@ -18,6 +18,10 @@ impl MIDIReceiver {
         Self { inner, endpoint }
     }
 
+    pub fn display_name(&self) -> &str {
+        self.endpoint.display_name()
+    }
+
     // doesn't block
     pub fn try_recv(&self) -> Result<MIDIPacket, std::sync::mpsc::TryRecvError> {
         self.inner.try_recv()

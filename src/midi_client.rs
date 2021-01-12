@@ -105,10 +105,11 @@ impl MIDIClientImpl {
         tx: std::sync::mpsc::Sender<MIDIPacket>,
         // f: impl Fn(crate::MIDIPacket),
     ) -> coremidi_sys::MIDIPortRef {
+        // typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
         let mut out = 0;
-        let block = block::ConcreteBlock::new(move |packet: &coremidi_sys::MIDIPacketList| {
+        let block = block::ConcreteBlock::new(move |packet: *const coremidi_sys::MIDIPacketList, _: std::ffi::c_void| {
             println!("input block");
-            let i = MIDIPacketListIterator::new(packet);
+            let i = MIDIPacketListIterator::new(unsafe { packet.as_ref().unwrap() } );
             for e in i {
                 let _ = tx.send(MIDIPacket::from(e));
             }

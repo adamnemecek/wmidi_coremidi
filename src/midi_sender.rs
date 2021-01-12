@@ -50,6 +50,10 @@ impl MIDISender {
         // todo!()
         Self { endpoint, port }
     }
+
+    pub fn display_name(&self) -> &str {
+        self.endpoint.display_name()
+    }
     // pub fn n
 
     //todo: what's that into pattern
