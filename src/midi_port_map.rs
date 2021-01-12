@@ -91,7 +91,8 @@ impl MIDIPortMapImpl<MIDIInput> {
 
         unsafe {
             for i in 0..count {
-                let endpoint = coremidi_sys::MIDIGetDestination(i as _);
+                let endpoint = coremidi_sys::MIDIGetSource(i as _);
+                assert!(endpoint != 0);
                 let output = MIDIInput::new(client.clone(), MIDIEndpoint::new(endpoint));
                 inner.insert(output.id(), output);
             }
@@ -107,7 +108,8 @@ impl MIDIPortMapImpl<MIDIOutput> {
 
         unsafe {
             for i in 0..count {
-                let endpoint = coremidi_sys::MIDIGetSource(i as _);
+                let endpoint = coremidi_sys::MIDIGetDestination(i as _);
+                assert!(endpoint !=  0);
                 let output = MIDIOutput::new(client.clone(), MIDIEndpoint::new(endpoint));
                 inner.insert(output.id(), output);
             }

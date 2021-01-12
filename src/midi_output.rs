@@ -37,6 +37,22 @@ impl MIDIOutput {
         self.inner.sender()
     }
 
+    // pub fn display_name1(&self) -> String {
+    //     self.inner.display_name1()
+    // }
+
+    pub fn display_name(&self) -> &str {
+        self.inner.display_name()
+    }
+
+    pub fn manufacturer(&self) -> &str {
+        self.inner.manufacturer()
+    }
+
+    // pub fn name(&self) -> &str {
+    //     self.inner.name()
+    // }
+
     // fn open(&mut self) {
     //     self.inner.open();
     // }
@@ -107,6 +123,21 @@ impl MIDIOutputImpl {
     fn id(&self) -> MIDIPortID {
         self.endpoint.id()
     }
+
+    fn display_name(&self) -> &str {
+        self.endpoint.display_name()
+    }
+
+    // fn display_name1(&self) -> String {
+    //     self.endpoint.display_name1()
+    // }
+
+    fn manufacturer(&self) -> &str {
+        self.endpoint.manufacturer()
+    }
+    // pub fn name(&self) -> &str {
+    // self.endpoint.name()
+    // }
 
     // fn connection(&self) -> MIDIPortConnectionState {
     //     if self.port.is_some() {

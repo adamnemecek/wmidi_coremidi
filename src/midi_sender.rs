@@ -58,7 +58,11 @@ impl MIDISender {
         let list = CreateMIDIPacketList(timestamp, data);
 
         unsafe {
-            coremidi_sys::MIDISend(self.port, self.endpoint.inner(), &list);
+            os_assert(coremidi_sys::MIDISend(
+                self.port,
+                self.endpoint.inner(),
+                &list,
+            ));
         }
     }
 

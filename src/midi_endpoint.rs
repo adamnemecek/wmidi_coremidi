@@ -62,6 +62,10 @@ impl MIDIEndpoint {
     pub fn display_name(&self) -> &str {
         self.inner.display_name()
     }
+
+    // pub fn display_name1(&self) -> String {
+    //     self.inner.display_name1()
+    // }
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -123,6 +127,10 @@ impl MIDIEndpointImpl {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyName) }
     }
 
+    // fn display_name1(&self) -> String {
+    //     unsafe { self.string_property(coremidi_sys::kMIDIPropertyDisplayName) }
+    // }
+
     fn display_name(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyDisplayName) }
     }
@@ -162,7 +170,7 @@ impl MIDIEndpointImpl {
     }
 
     fn i32_property(&self, property_id: *const core_foundation::string::__CFString) -> i32 {
-        let mut out = 0;
+        let mut out: i32 = 0;
         unsafe {
             coremidi_sys::MIDIObjectGetIntegerProperty(self.inner, property_id, &mut out);
         }
@@ -176,16 +184,46 @@ impl MIDIEndpointImpl {
             CFStringGetLength,
         };
         let mut s = std::mem::MaybeUninit::uninit();
-
         unsafe {
             coremidi_sys::MIDIObjectGetStringProperty(self.inner, property_id, s.as_mut_ptr());
             let s = s.assume_init();
             let len = CFStringGetLength(s);
             let data = CFStringGetCStringPtr(s, kCFStringEncodingUTF8) as *const u8;
+            debug_assert!(!data.is_null());
             let slice = std::slice::from_raw_parts(data, len as _);
             std::str::from_utf8(slice).unwrap()
         }
     }
+
+    // fn string_property(&self, property_id: *const core_foundation::string::__CFString) -> String {
+    //     use core_foundation::base::TCFType;
+    //     use core_foundation::string::{
+    //         kCFStringEncodingUTF8,
+    //         CFString,
+    //         CFStringGetCStringPtr,
+    //         CFStringGetLength,
+    //     };
+    //     println!("str id {}", self.inner);
+    //     let mut s = std::mem::MaybeUninit::uninit();
+
+    //     unsafe {
+    //         let prop: CFString = TCFType::wrap_under_create_rule(property_id);
+    //         println!("prop {:?}", prop);
+    //         coremidi_sys::MIDIObjectGetStringProperty(self.inner, property_id, s.as_mut_ptr());
+    //         let s = s.assume_init();
+    //         println!("1");
+    //         // let len = CFStringGetLength(s);
+    //         // let data = CFStringGetCStringPtr(s, kCFStringEncodingUTF8) as *const u8;
+    //         // let slice = std::slice::from_raw_parts(data, len as _);
+    //         // std::str::from_utf8(slice).unwrap()
+    //         if s.is_null() {
+    //             return "".to_string().into();
+    //         }
+    //         println!("2");
+    //         let cf_string: CFString = TCFType::wrap_under_create_rule(s);
+    //         cf_string.to_string().into()
+    //     }
+    // }
 }
 
 fn MIDIObjectGetType(id: coremidi_sys::MIDIEndpointRef) -> MIDIPortKind {

@@ -15,12 +15,19 @@ fn main() {
         let access = MIDIAccess::new("example");
         // let v = vec![1,2,3];
         // access.outputs().iter().first
-        let mut sender = access
-            .outputs()
-            .iter()
-            .next()
-            .map(|x| x.1.sender())
-            .unwrap();
+        for (k, v) in access.outputs().iter() {
+            println!("{:?}", v.manufacturer());
+        }
+        let outputs = access.outputs();
+
+        let port = outputs.iter().find(|x| x.1.manufacturer().contains("Snoize")).unwrap();
+
+        println!("here");
+        println!("port id {:?}", port.1.manufacturer());
+
+        // .map(|x| x.1.sender())
+        let sender = port.1.sender();
+        // .unwrap();
         let mut recv = access
             .inputs()
             .iter()

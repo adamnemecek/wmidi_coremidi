@@ -28,7 +28,19 @@ impl MIDIPortID {
     }
 }
 
+impl From<i32> for MIDIPortID {
+    fn from(a: i32) -> Self {
+        Self::new(a)
+    }
+}
+
 impl std::fmt::Display for MIDIPortID {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "MIDIPortID {{{}}}", self.inner)
+    }
+}
+
+impl std::fmt::Debug for MIDIPortID {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "MIDIPortID {{{}}}", self.inner)
     }
