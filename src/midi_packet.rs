@@ -35,7 +35,8 @@ extern "C" {
     fn AudioConvertNanosToHostTime(nanos: u64) -> u64;
 }
 
-pub(crate) type MIDIReadBlock = block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
+pub(crate) type MIDIReadBlock =
+    block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
 
 #[link(name = "CoreMIDI", kind = "framework")]
 extern "C" {
@@ -70,7 +71,9 @@ impl MIDIPacket {
     pub fn new(timestamp: u64, data: &[u8]) -> Self {
         let mut d = [0; PACKET_DATA_SIZE];
         let len = data.len();
-        d.copy_from_slice(data);
+        unsafe {
+            std::ptr::copy_nonoverlapping(data.as_ptr(), d.as_mut_ptr(), data.len());
+        }
         Self {
             len,
             timestamp,

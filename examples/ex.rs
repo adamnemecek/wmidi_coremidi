@@ -50,7 +50,6 @@ fn main() {
                     println!("error {:?}", e);
                 }
             }
-            
         });
 
         // println!("here");
