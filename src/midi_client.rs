@@ -1,3 +1,5 @@
+use coremidi_sys::{MIDIReadBlock, MIDIReadProc};
+
 use crate::prelude::*;
 
 // pub trait Hashable {
@@ -136,13 +138,13 @@ impl MIDIClientImpl {
 
             let name = core_foundation::string::CFString::new(name);
             // MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
-            os_assert(crate::MIDIInputPortCreateWithBlock(
-                self.inner,
-                name.as_concrete_TypeRef(),
-                &mut out,
-                // block_ref, // block,
-                &block
-            ));
+            // os_assert(crate::MIDIInputPortCreateWithBlock(
+            //     self.inner,
+            //     name.as_concrete_TypeRef(),
+            //     &mut out,
+            //     // block_ref, // block,
+            //     &block
+            // ));
 
             // os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
             //     self.inner,
@@ -152,12 +154,14 @@ impl MIDIClientImpl {
             //     & *block.copy()
             // ));
             // coremidi_sys::MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
-            // os_assert(coremidi_sys::MIDIInputPortCreate(
-            //         self.inner,
-            //         name.as_concrete_TypeRef(),
-            //         &mut out,
-            //         std::mem::transmute(block),
-            //     ));
+            let z: coremidi_sys::MIDIReadProc;
+            os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
+                    self.inner,
+                    name.as_concrete_TypeRef(),
+                    &mut out,
+                    // block as ,
+                    &*block as *const block::Block<_, _> as *mut std::ffi::c_void
+                ));
         }
         out
     }
