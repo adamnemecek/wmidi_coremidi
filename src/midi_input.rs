@@ -1,4 +1,7 @@
-use coremidi_sys::MIDIPortRef;
+use coremidi_sys::{
+    MIDIPortDisconnectSource,
+    MIDIPortRef,
+};
 
 use crate::prelude::*;
 
@@ -60,6 +63,10 @@ impl MIDIPort for MIDIInput {
         // todo!()
     }
 
+    fn close(&self) {
+        todo!()
+    }
+
     fn open(&self) {}
 
     fn connection(&self) -> MIDIPortConnectionState {
@@ -111,8 +118,15 @@ impl MIDIInputImpl {
     fn open(&mut self) {}
 
     fn close(&mut self) {
-        // self.endpoint
         // guard connection != .closed else { return }
+        if self.connection() == MIDIPortConnectionState::Closed {
+            return;
+        }
+        unsafe {
+            coremidi_sys::MIDIPortDisconnectSource(self.port_ref, self.endpoint.inner());
+        }
+
+        self.port_ref = 0;
 
         // switch type {
         // case .input:

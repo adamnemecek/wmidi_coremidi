@@ -35,6 +35,10 @@ impl MIDIPort for MIDIOutput {
         self.inner.open()
     }
 
+    fn close(&self) {
+        todo!()
+    }
+
     fn connection(&self) -> MIDIPortConnectionState {
         self.inner.connection()
     }
