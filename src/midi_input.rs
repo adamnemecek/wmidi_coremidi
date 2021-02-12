@@ -1,3 +1,5 @@
+use coremidi_sys::MIDIPortRef;
+
 use crate::prelude::*;
 
 // typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
@@ -58,8 +60,10 @@ impl MIDIPort for MIDIInput {
         // todo!()
     }
 
-    fn open(&self) {
+    fn open(&self) {}
 
+    fn connection(&self) -> MIDIPortConnectionState {
+        self.inner.connection()
     }
 }
 
@@ -67,8 +71,8 @@ impl MIDIPort for MIDIInput {
 struct MIDIInputImpl {
     client: MIDIClient,
     endpoint: MIDIEndpoint,
+    port_ref: coremidi_sys::MIDIPortRef,
     f: Option<std::rc::Rc<dyn Fn(MIDIEvent) -> ()>>,
-
 }
 // analogous to
 
@@ -88,6 +92,7 @@ impl MIDIInputImpl {
             client,
             endpoint,
             f: None,
+            port_ref: 0,
         }
     }
 
@@ -95,12 +100,30 @@ impl MIDIInputImpl {
         self.endpoint.id()
     }
 
-    fn open(&mut self) {
-        
+    fn connection(&self) -> MIDIPortConnectionState {
+        if self.port_ref == 0 {
+            MIDIPortConnectionState::Closed
+        } else {
+            MIDIPortConnectionState::Open
+        }
     }
 
-    fn close(&mut self) {
+    fn open(&mut self) {}
 
+    fn close(&mut self) {
+        // self.endpoint
+        // guard connection != .closed else { return }
+
+        // switch type {
+        // case .input:
+        //     OSAssert(MIDIPortDisconnectSource(ref, endpoint.ref))
+        // case .output:
+        //     endpoint.flush()
+        // }
+
+        // ref = 0
+        // onStateChange?(self)
+        // onStateChange = nil
     }
 
     fn set_on_midi_message(&mut self, f: impl Into<Option<std::rc::Rc<dyn Fn(MIDIEvent) -> ()>>>) {

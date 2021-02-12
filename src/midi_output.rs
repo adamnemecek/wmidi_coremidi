@@ -34,6 +34,10 @@ impl MIDIPort for MIDIOutput {
     fn open(&self) {
         self.inner.open()
     }
+
+    fn connection(&self) -> MIDIPortConnectionState {
+        self.inner.connection()
+    }
 }
 
 impl MIDIOutput {
@@ -91,7 +95,8 @@ impl std::hash::Hash for MIDIOutput {
 #[derive(Clone, PartialEq, Eq)]
 struct MIDIOutputImpl {
     endpoint: MIDIEndpoint,
-    // port: Option<coremidi_sys::MIDIPortRef>,
+    // port_ref:
+    port_ref: coremidi_sys::MIDIPortRef,
     // client: MIDIClient,
 }
 
@@ -100,6 +105,7 @@ impl MIDIOutputImpl {
         Self {
             // client,
             endpoint,
+            port_ref: 0,
             // port: None,
         }
     }
@@ -124,6 +130,14 @@ impl std::hash::Hash for MIDIOutputImpl {
 }
 
 impl MIDIOutputImpl {
+    fn connection(&self) -> MIDIPortConnectionState {
+        if self.port_ref == 0 {
+            MIDIPortConnectionState::Closed
+        } else {
+            MIDIPortConnectionState::Open
+        }
+    }
+
     fn open(&self) {
         // self.inner.open()
     }
