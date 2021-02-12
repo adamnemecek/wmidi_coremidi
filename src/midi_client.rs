@@ -112,6 +112,10 @@ impl MIDIClient {
         self.inner.lock().unwrap().notification(u);
     }
 
+    pub fn new1(name: &str, f: impl Fn()) -> Self {
+        todo!()
+    }
+
     pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
         let (tx, rx) = std::sync::mpsc::channel();
 
@@ -132,10 +136,11 @@ impl MIDIClient {
     pub(crate) fn create_input_port(
         &self,
         name: &str,
-        tx: std::sync::mpsc::Sender<MIDIPacket>,
-        // f: impl Fn(crate::MIDIPacket),
+        // tx: std::sync::mpsc::Sender<MIDIPacket>,
+        f: impl Fn(crate::MIDIPacket),
     ) -> coremidi_sys::MIDIPortRef {
-        self.inner.lock().unwrap().create_input_port(name, tx)
+        // self.inner.lock().unwrap().create_input_port(name, tx)
+        todo!()
         // self.inner.lock().unwrap().create_input_port(name, f)
         // todo!()
     }
@@ -171,7 +176,8 @@ impl MIDIClientImpl {
     fn create_input_port(
         &self,
         name: &str,
-        tx: std::sync::mpsc::Sender<MIDIPacket>,
+        // tx: std::sync::mpsc::Sender<MIDIPacket>,
+        f: impl Fn(MIDIPacket) -> (),
         // f: impl Fn(crate::MIDIPacket),
     ) -> coremidi_sys::MIDIPortRef {
         // typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
@@ -194,13 +200,14 @@ impl MIDIClientImpl {
         .copy();
 
         let p = MIDIPacket::new(0, &[1, 2, 3]);
-        tx.send(p);
+        // tx.send(p);
+        // todo!()
 
         // let a =  F: FnMut(&PacketList) + Send + 'static
         // let f = |list: &coremidi_sys::MIDIPacketList| {
 
         // };
-        println!("creating input port {}", name);
+        // println!("creating input port {}", name);
         // let block_ref = & *block.copy();
         unsafe {
             use core_foundation::base::TCFType;
@@ -289,6 +296,13 @@ impl Drop for MIDIClientImpl {
         }
     }
 }
+
+// extern "C" {
+//     pub fn MIDIClientCreateWithBlock(portName: *const core_foundation::string::__CFString,
+//                                      outClient: *mut MIDIClientRef,
+//                                      notifyBlock: MIDINotifyBlock)
+//      -> u32;
+// }
 
 fn MIDIClientCreate(name: &str, tx: std::sync::mpsc::Sender<u32>) -> coremidi_sys::MIDIClientRef {
     let mut out = 0;

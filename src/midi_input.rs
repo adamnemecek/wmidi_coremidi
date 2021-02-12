@@ -29,9 +29,9 @@ impl MIDIInput {
         }
     }
 
-    pub fn receiver(&self) -> MIDIReceiver {
-        self.inner.receiver()
-    }
+    // pub fn receiver(&self) -> MIDIReceiver {
+    //     self.inner.receiver()
+    // }
 }
 
 impl std::fmt::Debug for MIDIInput {
@@ -84,26 +84,27 @@ impl MIDIInputImpl {
         self.endpoint.id()
     }
 
-    pub fn receiver(&self) -> MIDIReceiver {
-        // if self.
-        let (tx, rx) = std::sync::mpsc::channel();
-        // self.client.create_input_port("port", |packet| {
-        //     tx.send(packet);
-        // });
-        let name = format!("MIDIReceiver{}", self.endpoint.display_name());
-        self.client.create_input_port(&name, tx);
+    // pub fn receiver(&self) -> MIDIReceiver {
+    //     // if self.
+    //     let (tx, rx) = std::sync::mpsc::channel();
+    //     // self.client.create_input_port("port", |packet| {
+    //     //     tx.send(packet);
+    //     // });
+    //     let name = format!("MIDIReceiver{}", self.endpoint.display_name());
+    //     // self.client.create_input_port(&name, tx);
+    //     todo!()
 
-        MIDIReceiver::new(self.endpoint.clone(), rx)
+    //     // MIDIReceiver::new(self.endpoint.clone(), rx)
 
-        // self.receiver = Some(rx);
+    //     // self.receiver = Some(rx);
 
-        // let `self` = self as! MIDIInput
-        // ref = MIDIInputPortCreate(ref: client.ref) {
-        //     `self`.onMIDIMessage?($0)
-        // }
+    //     // let `self` = self as! MIDIInput
+    //     // ref = MIDIInputPortCreate(ref: client.ref) {
+    //     //     `self`.onMIDIMessage?($0)
+    //     // }
 
-        // OSAssert(MIDIPortConnectSource(ref, endpoint.ref, nil))
-    }
+    //     // OSAssert(MIDIPortConnectSource(ref, endpoint.ref, nil))
+    // }
 
     // fn close(&mut self) {
     //     //
