@@ -10,8 +10,32 @@ extern "C" {
         client: u32,
         portName: *const core_foundation::string::__CFString,
         outPort: *mut u32,
-        readBlock: block::RcBlock<(*const coremidi_sys::MIDIPacketList, std::ffi::c_void), ()>,
+        readBlock: block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>,
     ) -> i32;
+}
+
+fn MIDIInputPortCreate(
+    name: &str,
+    f: impl Fn(&[MIDIPacket])
+) -> Option<u32> {
+    let mut block = block::ConcreteBlock::new(
+        move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
+
+            // let len = packet.numPackets;
+            // println!("input block");
+            // todo!();
+            // let i = MIDIPacketListIterator::new(unsafe { packet.as_ref().unwrap() });
+            // let p = MIDIPacket::new(0, &[1,2,3]);
+            // tx.send(p);
+            // println!("here");
+            // for e in i {
+            //     let packet = MIDIPacket::from(e);
+            //     let _ = tx.send(packet);
+            // }
+        },
+    )
+    .copy();
+    Some(0)
 }
 
 // pub trait Hashable {
