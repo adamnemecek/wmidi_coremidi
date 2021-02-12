@@ -29,6 +29,10 @@ impl MIDIInput {
         }
     }
 
+    pub fn set_on_midi_message(&mut self, f: impl Fn(MIDIEvent) -> ()) {
+
+    }
+
     // pub fn receiver(&self) -> MIDIReceiver {
     //     self.inner.receiver()
     // }
@@ -86,6 +90,8 @@ impl MIDIInputImpl {
     fn id(&self) -> MIDIPortID {
         self.endpoint.id()
     }
+
+
 
     // pub fn receiver(&self) -> MIDIReceiver {
     //     // if self.

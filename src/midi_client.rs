@@ -19,6 +19,10 @@ extern "C" {
     ) -> i32;
 }
 
+pub struct MIDIEvent {
+    
+}
+
 // pub struct MIDIEvent<'a> {
 //     pub timestamp: coremidi_sys::MIDITimeStamp,
 //     pub data: &'a [u8],

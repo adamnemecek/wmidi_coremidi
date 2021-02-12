@@ -6,11 +6,16 @@ fn main() {
         tx.send(10);
     });
 
-    let mut output = access.inputs().iter().find(|x|
+    let res = access.inputs().iter().find(|x|
         true
     );
+    let input = res.unwrap().1;
 
-    
+    let mut input = input.clone();
+    input.set_on_midi_message(|x| {
+
+    });
+
 
     
 }

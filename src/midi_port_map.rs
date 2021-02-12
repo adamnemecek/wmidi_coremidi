@@ -8,9 +8,10 @@ pub struct MIDIPortMapImplIterator<'a, T: MIDIPort> {
 }
 
 impl<'a, T: MIDIPort> Iterator for MIDIPortMapImplIterator<'a, T> {
-    type Item = (&'a MIDIPortID, &'a T);
+    type Item = (MIDIPortID, T);
     fn next(&mut self) -> Option<Self::Item> {
-        self.inner.next()
+        // self.inner.next()
+        todo!()
     }
 }
 
