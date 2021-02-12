@@ -15,8 +15,8 @@ pub struct MIDIOutput {
 // impl Eq for MIDIOutput {}
 
 impl MIDIOutput {
-    pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
-        let inner = MIDIOutputImpl::new(client, endpoint);
+    pub(crate) fn new(endpoint: MIDIEndpoint) -> Self {
+        let inner = MIDIOutputImpl::new(endpoint);
         // let hash = crate::hash(&port);
         Self {
             // inner: std::sync::Arc::new(std::sync::Mutex::new(port)),
@@ -88,13 +88,13 @@ impl std::hash::Hash for MIDIOutput {
 struct MIDIOutputImpl {
     endpoint: MIDIEndpoint,
     // port: Option<coremidi_sys::MIDIPortRef>,
-    client: MIDIClient,
+    // client: MIDIClient,
 }
 
 impl MIDIOutputImpl {
-    fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+    fn new(endpoint: MIDIEndpoint) -> Self {
         Self {
-            client,
+            // client,
             endpoint,
             // port: None,
         }
