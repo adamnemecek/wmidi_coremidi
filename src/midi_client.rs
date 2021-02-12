@@ -94,7 +94,7 @@ pub(crate) fn hash<T: std::hash::Hash>(v: &T) -> u64 {
 #[derive(Clone)]
 // needs to be arc so that it
 pub(crate) struct MIDIClient {
-    inner: std::sync::Arc<std::sync::Mutex<MIDIClientImpl>>,
+    inner: std::sync::Arc<MIDIClientImpl>,
     hash: u64,
 }
 
@@ -109,7 +109,8 @@ impl Eq for MIDIClient {}
 
 impl MIDIClient {
     pub fn notification(&mut self, u: u32) {
-        self.inner.lock().unwrap().notification(u);
+        // self.inner.lock().unwrap().notification(u);
+        todo!()
     }
 
     pub fn new1(name: &str, f: impl Fn(MIDINotification)) -> Self {
@@ -117,20 +118,21 @@ impl MIDIClient {
     }
 
     pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
-        let (tx, rx) = std::sync::mpsc::channel();
+        todo!()
+        // let (tx, rx) = std::sync::mpsc::channel();
 
-        let client = MIDIClientImpl::new(name, tx);
-        let hash = hash(&client);
-        let inner = std::sync::Arc::new(std::sync::Mutex::new(client));
-        // let clone = inner.clone();
-        let self_ = Self { inner, hash };
-        let mut clone = self_.clone();
-        std::thread::spawn(move || {
-            let v = rx.recv().unwrap();
-            clone.notification(v);
-        });
+        // let client = MIDIClientImpl::new(name, tx);
+        // let hash = hash(&client);
+        // let inner = std::sync::Arc::new(std::sync::Mutex::new(client));
+        // // let clone = inner.clone();
+        // let self_ = Self { inner, hash };
+        // let mut clone = self_.clone();
+        // std::thread::spawn(move || {
+        //     let v = rx.recv().unwrap();
+        //     clone.notification(v);
+        // });
 
-        self_
+        // self_
     }
 
     // pub(crate) fn create_input_port(
