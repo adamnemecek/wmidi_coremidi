@@ -13,8 +13,9 @@ fn main() {
 
     let mut input = input.clone();
     input.set_on_midi_message(|x| {
-
+        tx.send(10);
     });
+
 
 
     

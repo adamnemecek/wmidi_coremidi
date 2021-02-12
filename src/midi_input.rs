@@ -30,7 +30,9 @@ impl MIDIInput {
     }
 
     pub fn set_on_midi_message(&mut self, f: impl Fn(MIDIEvent) -> ()) {
+        // close();
 
+        // open();
     }
 
     // pub fn receiver(&self) -> MIDIReceiver {
@@ -65,6 +67,8 @@ impl MIDIPort for MIDIInput {
 struct MIDIInputImpl {
     client: MIDIClient,
     endpoint: MIDIEndpoint,
+    f: Option<std::rc::Rc<dyn Fn(MIDIEvent) -> ()>>,
+
 }
 // analogous to
 
@@ -83,7 +87,7 @@ impl MIDIInputImpl {
         Self {
             client,
             endpoint,
-            // receiver: None,
+            f: None,
         }
     }
 
@@ -91,7 +95,19 @@ impl MIDIInputImpl {
         self.endpoint.id()
     }
 
+    fn open(&mut self) {
 
+    }
+
+    fn close(&mut self) {
+
+    }
+
+    fn set_on_midi_message(&mut self, f: impl Into<Option<std::rc::Rc<dyn Fn(MIDIEvent) -> ()>>>) {
+        self.close();
+        self.f = f.into();
+        self.open();
+    }
 
     // pub fn receiver(&self) -> MIDIReceiver {
     //     // if self.
