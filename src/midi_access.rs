@@ -9,16 +9,18 @@ pub struct MIDIAccess {
 }
 
 impl MIDIAccess {
-    pub fn new(name: &str) -> Self {
-        let (tx, rx) = std::sync::mpsc::channel();
+    pub fn new(name: &str, f: impl Fn(MIDINotification) -> ()) -> Self {
+        todo!()
+        // let (tx, rx) = std::sync::mpsc::channel();
 
-        let inner = std::sync::Arc::new(std::sync::Mutex::new(MIDIAccessImpl::new(name, tx)));
+        // let inner = std::sync::Arc::new(std::sync::Mutex::new(MIDIAccessImpl::new(name, tx)));
         // let clone = inner.clone();
         // std::thread::spawn(move || {
         //     let d = rx.recv().unwrap();
         //     clone.lock().unwrap().notification(d);
         // });
-        Self { inner }
+        // Self { inner }
+        // todo!()
     }
 
     pub fn inputs(&self) -> MIDIPortMap<MIDIInput> {

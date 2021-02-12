@@ -297,12 +297,12 @@ impl Drop for MIDIClientImpl {
     }
 }
 
-// extern "C" {
-//     pub fn MIDIClientCreateWithBlock(portName: *const core_foundation::string::__CFString,
-//                                      outClient: *mut MIDIClientRef,
-//                                      notifyBlock: MIDINotifyBlock)
-//      -> u32;
-// }
+extern "C" {
+    pub fn MIDIClientCreateWithBlock(portName: *const core_foundation::string::__CFString,
+                                     outClient: *mut coremidi_sys::MIDIClientRef,
+                                     notifyBlock: block::Block<(), ()>)
+     -> u32;
+}
 
 fn MIDIClientCreate(name: &str, tx: std::sync::mpsc::Sender<u32>) -> coremidi_sys::MIDIClientRef {
     let mut out = 0;

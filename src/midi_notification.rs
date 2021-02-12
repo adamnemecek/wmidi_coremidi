@@ -1,4 +1,4 @@
-pub(crate) enum MIDINotification {
+pub enum MIDINotification {
     Added(),
     Removed(),
 }
