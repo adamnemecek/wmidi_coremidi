@@ -96,13 +96,22 @@ impl std::hash::Hash for MIDIOutput {
     }
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone)]
 struct MIDIOutputImpl {
     endpoint: MIDIEndpoint,
     // port_ref:
     port_ref: coremidi_sys::MIDIPortRef,
+    on_state_change: Option<std::rc::Rc<dyn Fn(MIDIOutput) -> ()>>,
     // client: MIDIClient,
 }
+
+impl PartialEq for MIDIOutputImpl {
+    fn eq(&self, other: &Self) -> bool {
+        self.endpoint == other.endpoint
+    }
+}
+
+impl Eq for MIDIOutputImpl { }
 
 impl MIDIOutputImpl {
     fn new(endpoint: MIDIEndpoint) -> Self {
@@ -110,6 +119,7 @@ impl MIDIOutputImpl {
             // client,
             endpoint,
             port_ref: 0,
+            on_state_change: None,
             // port: None,
         }
     }
@@ -165,14 +175,6 @@ impl MIDIOutputImpl {
     // self.endpoint.name()
     // }
 
-    // fn connection(&self) -> MIDIPortConnectionState {
-    //     if self.port.is_some() {
-    //         MIDIPortConnectionState::Open
-    //     } else {
-    //         MIDIPortConnectionState::Closed
-    //     }
-    // }
-
     // fn sender(&self) -> MIDISender {
     //     let port = self.client.create_output_port("");
     //     MIDISender::new(&self.client, self.endpoint.clone(), port)
@@ -185,13 +187,17 @@ impl MIDIOutputImpl {
     //     self.port = Some(self.client.create_output_port(""));
     // }
 
-    // fn close(&mut self) {
-    //     if self.connection() == MIDIPortConnectionState::Closed {
-    //         return;
-    //     }
-    //     self.endpoint.flush();
-    //     self.port = None;
-    // }
+    fn close(&mut self) {
+        if self.connection() == MIDIPortConnectionState::Closed {
+            return;
+        }
+        self.endpoint.flush();
+        self.port_ref = 0;
+        if let Some(ref on_state_change) = self.on_state_change {
+            on_state_change(MIDIOutput::new(self.endpoint.clone()))
+        }
+        self.on_state_change = None;
+    }
 }
 
 impl std::fmt::Display for MIDIOutputImpl {
