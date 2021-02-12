@@ -33,7 +33,7 @@ impl From<coremidi_sys::MIDIObjectType> for MIDIEndpointKind {
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
 pub struct MIDIEndpoint {
-    inner: std::sync::Arc<MIDIEndpointImpl>,
+    inner: MIDIEndpointImpl,
 }
 
 impl MIDIEndpoint {
@@ -43,7 +43,7 @@ impl MIDIEndpoint {
 
     pub fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
         Self {
-            inner: std::sync::Arc::new(MIDIEndpointImpl::new(inner)),
+            inner: MIDIEndpointImpl::new(inner),
         }
     }
 

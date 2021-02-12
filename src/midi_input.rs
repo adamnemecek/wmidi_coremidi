@@ -19,8 +19,8 @@ pub struct MIDIInput {
 // impl Eq for MIDIInput {}
 
 impl MIDIInput {
-    pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
-        let inner = MIDIInputImpl::new(client, endpoint);
+    pub(crate) fn new(endpoint: MIDIEndpoint) -> Self {
+        let inner = MIDIInputImpl::new(endpoint);
         // let hash = crate::hash(&inner);
         Self {
             // inner: std::sync::Arc::new(std::sync::Mutex::new(inner)),
@@ -55,7 +55,7 @@ impl MIDIPort for MIDIInput {
 
 #[derive(Clone)]
 struct MIDIInputImpl {
-    client: MIDIClient,
+    // client: MIDIClient,
     endpoint: MIDIEndpoint,
     // receiver: Option<std::sync::mpsc::Receiver<crate::MIDIPacket>>,
 }
@@ -72,9 +72,9 @@ impl PartialEq for MIDIInputImpl {
 impl Eq for MIDIInputImpl {}
 
 impl MIDIInputImpl {
-    fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+    fn new(endpoint: MIDIEndpoint) -> Self {
         Self {
-            client,
+            // client,
             endpoint,
             // receiver: None,
         }
