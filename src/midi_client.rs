@@ -112,7 +112,7 @@ impl MIDIClient {
         self.inner.lock().unwrap().notification(u);
     }
 
-    pub fn new1(name: &str, f: impl Fn()) -> Self {
+    pub fn new1(name: &str, f: impl Fn(MIDINotification)) -> Self {
         todo!()
     }
 
@@ -133,21 +133,21 @@ impl MIDIClient {
         self_
     }
 
-    pub(crate) fn create_input_port(
-        &self,
-        name: &str,
-        // tx: std::sync::mpsc::Sender<MIDIPacket>,
-        f: impl Fn(crate::MIDIPacket),
-    ) -> coremidi_sys::MIDIPortRef {
-        // self.inner.lock().unwrap().create_input_port(name, tx)
-        todo!()
-        // self.inner.lock().unwrap().create_input_port(name, f)
-        // todo!()
-    }
+    // pub(crate) fn create_input_port(
+    //     &self,
+    //     name: &str,
+    //     // tx: std::sync::mpsc::Sender<MIDIPacket>,
+    //     f: impl Fn(crate::MIDIPacket),
+    // ) -> coremidi_sys::MIDIPortRef {
+    //     // self.inner.lock().unwrap().create_input_port(name, tx)
+    //     todo!()
+    //     // self.inner.lock().unwrap().create_input_port(name, f)
+    //     // todo!()
+    // }
 
-    pub(crate) fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
-        self.inner.lock().unwrap().create_output_port(name)
-    }
+    // pub(crate) fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
+    //     self.inner.lock().unwrap().create_output_port(name)
+    // }
 }
 
 #[derive(Clone, PartialEq, Eq)]

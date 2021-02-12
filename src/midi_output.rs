@@ -33,9 +33,9 @@ impl MIDIPort for MIDIOutput {
 }
 
 impl MIDIOutput {
-    pub fn sender(&self) -> MIDISender {
-        self.inner.sender()
-    }
+    // pub fn sender(&self) -> MIDISender {
+    //     self.inner.sender()
+    // }
 
     // pub fn display_name1(&self) -> String {
     //     self.inner.display_name1()
@@ -147,10 +147,10 @@ impl MIDIOutputImpl {
     //     }
     // }
 
-    fn sender(&self) -> MIDISender {
-        let port = self.client.create_output_port("");
-        MIDISender::new(&self.client, self.endpoint.clone(), port)
-    }
+    // fn sender(&self) -> MIDISender {
+    //     let port = self.client.create_output_port("");
+    //     MIDISender::new(&self.client, self.endpoint.clone(), port)
+    // }
 
     // fn open(&mut self) {
     //     if self.connection() == MIDIPortConnectionState::Open {
