@@ -30,6 +30,11 @@ impl MIDIPort for MIDIOutput {
         // MIDIPortID::new(self.inner.borrow().id())
         self.inner.id()
     }
+
+
+    fn open(&self) {
+        self.inner.open()
+    }
 }
 
 impl MIDIOutput {
@@ -120,6 +125,10 @@ impl std::hash::Hash for MIDIOutputImpl {
 }
 
 impl MIDIOutputImpl {
+    fn open(&self) {
+        // self.inner.open()
+    }
+
     fn id(&self) -> MIDIPortID {
         self.endpoint.id()
     }
