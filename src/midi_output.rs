@@ -31,7 +31,6 @@ impl MIDIPort for MIDIOutput {
         self.inner.id()
     }
 
-
     fn open(&self) {
         self.inner.open()
     }

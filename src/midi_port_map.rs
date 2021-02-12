@@ -94,7 +94,7 @@ impl MIDIPortMapImpl<MIDIInput> {
             for i in 0..count {
                 let endpoint = coremidi_sys::MIDIGetSource(i as _);
                 assert!(endpoint != 0);
-                let output = MIDIInput::new( client.clone(), MIDIEndpoint::new(endpoint));
+                let output = MIDIInput::new(client.clone(), MIDIEndpoint::new(endpoint));
                 inner.insert(output.id(), output);
             }
         }

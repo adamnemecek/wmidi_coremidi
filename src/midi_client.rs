@@ -19,9 +19,7 @@ extern "C" {
     ) -> i32;
 }
 
-pub struct MIDIEvent {
-    
-}
+pub struct MIDIEvent {}
 
 // pub struct MIDIEvent<'a> {
 //     pub timestamp: coremidi_sys::MIDITimeStamp,
@@ -304,10 +302,11 @@ impl Drop for MIDIClientImpl {
 }
 
 extern "C" {
-    pub fn MIDIClientCreateWithBlock(portName: *const core_foundation::string::__CFString,
-                                     outClient: *mut coremidi_sys::MIDIClientRef,
-                                     notifyBlock: block::Block<(), ()>)
-     -> u32;
+    pub fn MIDIClientCreateWithBlock(
+        portName: *const core_foundation::string::__CFString,
+        outClient: *mut coremidi_sys::MIDIClientRef,
+        notifyBlock: block::Block<(), ()>,
+    ) -> u32;
 }
 
 fn MIDIClientCreate(name: &str, tx: std::sync::mpsc::Sender<u32>) -> coremidi_sys::MIDIClientRef {
