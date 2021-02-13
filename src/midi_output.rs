@@ -111,7 +111,7 @@ impl PartialEq for MIDIOutputImpl {
     }
 }
 
-impl Eq for MIDIOutputImpl { }
+impl Eq for MIDIOutputImpl {}
 
 impl MIDIOutputImpl {
     fn new(endpoint: MIDIEndpoint) -> Self {
