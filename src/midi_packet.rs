@@ -2,10 +2,10 @@ const PACKET_DATA_SIZE: usize = 256;
 
 // #[derive(Default)]
 
-pub struct MIDIPacket {
-    timestamp: u64,
-    len: usize,
-    data: [u8; PACKET_DATA_SIZE],
+pub(crate) struct MIDIPacket {
+    pub(crate) timestamp: u64,
+    pub(crate) len: usize,
+    pub(crate) data: [u8; PACKET_DATA_SIZE],
 }
 
 impl Default for MIDIPacket {

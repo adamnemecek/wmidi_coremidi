@@ -22,10 +22,15 @@ pub struct MIDIEvent<'a> {
 
 impl<'a> MIDIEvent<'a> {
     pub fn new(timestamp: coremidi_sys::MIDITimeStamp, data: &'a [u8]) -> Self {
-        Self {
-            timestamp,
-            data
-        }
+        Self { timestamp, data }
+    }
+}
+
+impl<'a> From<&'a coremidi_sys::MIDIPacket> for MIDIEvent<'a> {
+    fn from(p: &'a coremidi_sys::MIDIPacket) -> Self {
+        let slice = unsafe { std::slice::from_raw_parts(p.data.as_ptr(), p.length as _) };
+
+        Self::new(p.timeStamp, slice)
     }
 }
 

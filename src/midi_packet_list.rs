@@ -2,7 +2,6 @@
 use crate::prelude::*;
 
 pub struct MIDIPacketListIterator<'a> {
-
     count: usize,
     inner: *const coremidi_sys::MIDIPacket,
     ph: std::marker::PhantomData<&'a ()>,
@@ -10,12 +9,13 @@ pub struct MIDIPacketListIterator<'a> {
 
 impl<'a> MIDIPacketListIterator<'a> {
     pub(crate) fn new(list: &'a coremidi_sys::MIDIPacketList) -> Self {
-        // coremidi_sys::MIDIPacketNext(pkt)
-        todo!()
+        Self {
+            count: list.numPackets as _,
+            inner: list.packet.as_ptr(),
+            ph: Default::default(),
+        }
     }
 }
-
-impl<'a> MIDIPacketListIterator<'a> {}
 
 impl<'a> Iterator for MIDIPacketListIterator<'a> {
     type Item = MIDIEvent<'a>;
