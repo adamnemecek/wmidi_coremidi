@@ -63,7 +63,21 @@ impl MIDIAccessImpl {
         self.inputs.clone()
     }
 
+    pub fn input_for(&self, output: &MIDIOutput) -> Option<MIDIInput> {
+        self.inputs()
+            .iter()
+            .find(|(id, input)| input.id() == output.id())
+            .map(|(_, port)| port)
+    }
+
     pub fn outputs(&self) -> MIDIPortMap<MIDIOutput> {
         self.outputs.clone()
+    }
+
+    pub fn output_for(&self, input: &MIDIInput) -> Option<MIDIOutput> {
+        self.outputs
+            .iter()
+            .find(|(id, output)| output.id() == input.id())
+            .map(|(_, port)| port)
     }
 }
