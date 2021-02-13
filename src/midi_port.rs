@@ -48,8 +48,11 @@ impl std::fmt::Debug for MIDIPortID {
 
 pub trait MIDIPort: Eq + Clone + std::hash::Hash + std::fmt::Debug {
     fn id(&self) -> MIDIPortID;
+    // fn manufacturer(&self) -> &str;
+    // fn name(&self) -> &str;
+    // fn display_name(&self) -> &str;
+    // fn kind(&self) ->
+    fn connection(&self) -> MIDIPortConnectionState;
     fn open(&self);
     fn close(&self);
-
-    fn connection(&self) -> MIDIPortConnectionState;
 }

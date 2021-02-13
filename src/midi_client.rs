@@ -103,7 +103,7 @@ impl MIDIClient {
     pub fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
         let inner = MIDIClientImpl::new(name, f);
         Self {
-            inner: inner.into()
+            inner: inner.into(),
         }
     }
 
