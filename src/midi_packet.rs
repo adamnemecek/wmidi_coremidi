@@ -35,22 +35,19 @@ extern "C" {
     fn AudioConvertNanosToHostTime(nanos: u64) -> u64;
 }
 
-pub(crate) type MIDIReadBlock =
-    block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
+// pub(crate) type MIDIReadBlock =
+//     block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
 
-#[link(name = "CoreMIDI", kind = "framework")]
-extern "C" {
-    pub(crate) fn MIDIInputPortCreateWithBlock(
-        client: u32,
-        portName: *const core_foundation::string::__CFString,
-        outPort: *mut u32,
-        readBlock: MIDIReadBlock,
-        // read_block: *mut std::ffi:c_void
-    ) -> coremidi_sys::OSStatus;
-    // fn MIDIInputPortCreateWithBlock() {
-
-    // }
-}
+// #[link(name = "CoreMIDI", kind = "framework")]
+// extern "C" {
+//     pub(crate) fn MIDIInputPortCreateWithBlock(
+//         client: u32,
+//         portName: *const core_foundation::string::__CFString,
+//         outPort: *mut u32,
+//         readBlock: MIDIReadBlock,
+//         // read_block: *mut std::ffi:c_void
+//     ) -> coremidi_sys::OSStatus;
+// }
 
 // pub fn current_host_time() -> u64 {
 //     unsafe { AudioGetCurrentHostTime() }
