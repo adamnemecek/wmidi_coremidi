@@ -12,8 +12,7 @@ impl<'a, T: MIDIPort> Iterator for MIDIPortMapImplIterator<'a, T> {
     }
 
     fn next(&mut self) -> Option<Self::Item> {
-        // self.inner.next().map(|(id, port)| (*id, port))
-        todo!()
+        self.inner.next().map(|(id, port)| (*id, port.clone()))
     }
 }
 
