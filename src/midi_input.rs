@@ -115,7 +115,30 @@ impl MIDIInputImpl {
         }
     }
 
-    fn open(&mut self) {}
+    fn open(&mut self) {
+        if self.connection() == MIDIPortConnectionState::Closed {
+            return;
+        }
+        MIDIInputPortCreate(self.client.inner(), "", |event| {});
+
+        // MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
+        // guard connection != .open else { return }
+
+        // switch type {
+        // case .input:
+        //     let `self` = self as! MIDIInput
+        //     ref = MIDIInputPortCreate(ref: client.ref) {
+        //         `self`.onMIDIMessage?($0)
+        //     }
+
+        //     OSAssert(MIDIPortConnectSource(ref, endpoint.ref, nil))
+
+        // case .output:
+        //     ref = MIDIOutputPortCreate(ref: client.ref)
+        // }
+
+        // onStateChange?(self)
+    }
 
     fn close(&mut self) {
         // guard connection != .closed else { return }
@@ -183,5 +206,45 @@ impl std::fmt::Debug for MIDIInputImpl {
 impl std::hash::Hash for MIDIInputImpl {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.endpoint.id().hash(state)
+    }
+}
+
+#[link(name = "CoreMIDI", kind = "framework")]
+extern "C" {
+    fn MIDIInputPortCreateWithBlock(
+        client: u32,
+        portName: *const core_foundation::string::__CFString,
+        outPort: *mut u32,
+        readBlock: block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>,
+    ) -> i32;
+}
+
+fn MIDIInputPortCreate(client: u32, name: &str, f: impl Fn(&[MIDIPacket])) -> Option<u32> {
+    use core_foundation::base::TCFType;
+    let mut block = block::ConcreteBlock::new(
+        move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
+            // let i = MIDIPacketListIterator
+            todo!("input block");
+            // todo!();
+            // let i = MIDIPacketListIterator::new(unsafe { packet.as_ref().unwrap() });
+            // let p = MIDIPacket::new(0, &[1,2,3]);
+            // tx.send(p);
+            // println!("here");
+            // for e in i {
+            //     let packet = MIDIPacket::from(e);
+            //     let _ = tx.send(packet);
+            // }
+        },
+    )
+    .copy();
+    let name = core_foundation::string::CFString::new(name);
+    let mut out = 0;
+    let err = unsafe {
+        MIDIInputPortCreateWithBlock(client, name.as_concrete_TypeRef(), &mut out, block)
+    };
+    if err == 0 {
+        Some(out)
+    } else {
+        None
     }
 }

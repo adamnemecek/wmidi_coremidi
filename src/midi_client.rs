@@ -1,5 +1,6 @@
 use core_foundation::base::TCFType;
 use coremidi_sys::{
+    MIDIClientRef,
     MIDIReadBlock,
     MIDIReadProc,
     MIDITimeStamp,
@@ -8,16 +9,6 @@ use coremidi_sys::{
 use crate::prelude::*;
 
 // typealias MIDIReadBlock = (UnsafePointer<MIDIPacketList>, UnsafeMutableRawPointer?) -> Void
-
-#[link(name = "CoreMIDI", kind = "framework")]
-extern "C" {
-    fn MIDIInputPortCreateWithBlock(
-        client: u32,
-        portName: *const core_foundation::string::__CFString,
-        outPort: *mut u32,
-        readBlock: block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>,
-    ) -> i32;
-}
 
 pub struct MIDIEvent {}
 
@@ -36,36 +27,6 @@ pub struct MIDIEvent {}
 //         todo!()
 //     }
 // }
-
-fn MIDIInputPortCreate(client: u32, name: &str, f: impl Fn(&[MIDIPacket])) -> Option<u32> {
-    use core_foundation::base::TCFType;
-    let mut block = block::ConcreteBlock::new(
-        move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
-            // let i = MIDIPacketListIterator
-            todo!("input block");
-            // todo!();
-            // let i = MIDIPacketListIterator::new(unsafe { packet.as_ref().unwrap() });
-            // let p = MIDIPacket::new(0, &[1,2,3]);
-            // tx.send(p);
-            // println!("here");
-            // for e in i {
-            //     let packet = MIDIPacket::from(e);
-            //     let _ = tx.send(packet);
-            // }
-        },
-    )
-    .copy();
-    let name = core_foundation::string::CFString::new(name);
-    let mut out = 0;
-    let err = unsafe {
-        MIDIInputPortCreateWithBlock(client, name.as_concrete_TypeRef(), &mut out, block)
-    };
-    if err == 0 {
-        Some(out)
-    } else {
-        None
-    }
-}
 
 // pub trait Hashable {
 //     fn get_hash(&self) -> u64;
@@ -110,6 +71,10 @@ impl Eq for MIDIClient {}
 // input_observer: Option<std::sync::Arc<std::sync::Mutex<Box<dyn MIDIInputObserver>>>>,
 
 impl MIDIClient {
+    pub fn inner(&self) -> coremidi_sys::MIDIClientRef {
+        self.inner.inner()
+    }
+
     pub fn notification(&mut self, u: u32) {
         // self.inner.lock().unwrap().notification(u);
         todo!()
@@ -163,6 +128,9 @@ struct MIDIClientImpl {
 
 // coremidi_sys::MIDIReadBlock
 impl MIDIClientImpl {
+    pub(crate) fn inner(&self) -> coremidi_sys::MIDIClientRef {
+        self.inner
+    }
     // fn new(name: &str) -> Self {
     //     Self {
     //         inner: MIDIClientCreate(name, |x| { }),
@@ -177,108 +145,108 @@ impl MIDIClientImpl {
         }
     }
 
-    fn create_input_port(
-        &self,
-        name: &str,
-        // tx: std::sync::mpsc::Sender<MIDIPacket>,
-        f: impl Fn(MIDIPacket) -> (),
-        // f: impl Fn(crate::MIDIPacket),
-    ) -> coremidi_sys::MIDIPortRef {
-        // typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
-        let mut out = 0;
-        // let tx = tx.clone();
-        let mut block = block::ConcreteBlock::new(
-            move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
-                // println!("input block");
-                // todo!();
-                // let i = MIDIPacketListIterator::new(unsafe { packet.as_ref().unwrap() });
-                // let p = MIDIPacket::new(0, &[1,2,3]);
-                // tx.send(p);
-                // println!("here");
-                // for e in i {
-                //     let packet = MIDIPacket::from(e);
-                //     let _ = tx.send(packet);
-                // }
-            },
-        )
-        .copy();
+    // fn create_input_port(
+    //     &self,
+    //     name: &str,
+    //     // tx: std::sync::mpsc::Sender<MIDIPacket>,
+    //     f: impl Fn(MIDIPacket) -> (),
+    //     // f: impl Fn(crate::MIDIPacket),
+    // ) -> coremidi_sys::MIDIPortRef {
+    //     // typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
+    //     let mut out = 0;
+    //     // let tx = tx.clone();
+    //     let mut block = block::ConcreteBlock::new(
+    //         move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
+    //             // println!("input block");
+    //             // todo!();
+    //             // let i = MIDIPacketListIterator::new(unsafe { packet.as_ref().unwrap() });
+    //             // let p = MIDIPacket::new(0, &[1,2,3]);
+    //             // tx.send(p);
+    //             // println!("here");
+    //             // for e in i {
+    //             //     let packet = MIDIPacket::from(e);
+    //             //     let _ = tx.send(packet);
+    //             // }
+    //         },
+    //     )
+    //     .copy();
 
-        let p = MIDIPacket::new(0, &[1, 2, 3]);
-        // tx.send(p);
-        // todo!()
+    //     let p = MIDIPacket::new(0, &[1, 2, 3]);
+    //     // tx.send(p);
+    //     // todo!()
 
-        // let a =  F: FnMut(&PacketList) + Send + 'static
-        // let f = |list: &coremidi_sys::MIDIPacketList| {
+    //     // let a =  F: FnMut(&PacketList) + Send + 'static
+    //     // let f = |list: &coremidi_sys::MIDIPacketList| {
 
-        // };
-        // println!("creating input port {}", name);
-        // let block_ref = & *block.copy();
-        unsafe {
-            use core_foundation::base::TCFType;
+    //     // };
+    //     // println!("creating input port {}", name);
+    //     // let block_ref = & *block.copy();
+    //     unsafe {
+    //         use core_foundation::base::TCFType;
 
-            let name = core_foundation::string::CFString::new(name);
-            // MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
-            // os_assert(crate::MIDIInputPortCreateWithBlock(
-            //     self.inner,
-            //     name.as_concrete_TypeRef(),
-            //     &mut out,
-            //     // block_ref, // block,
-            //     &block
-            // ));
+    //         let name = core_foundation::string::CFString::new(name);
+    //         // MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
+    //         // os_assert(crate::MIDIInputPortCreateWithBlock(
+    //         //     self.inner,
+    //         //     name.as_concrete_TypeRef(),
+    //         //     &mut out,
+    //         //     // block_ref, // block,
+    //         //     &block
+    //         // ));
 
-            // coremidi_sys::MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
+    //         // coremidi_sys::MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
 
-            // os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
-            //     self.inner,
-            //     name.as_concrete_TypeRef(),
-            //     &mut out,
-            //     // std::mem::transmute(block)
-            //     block,
-            // ));
-            // coremidi_sys::MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
-            // let z: coremidi_sys::MIDIReadProc;
-            // os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
-            //     self.inner,
-            //     name.as_concrete_TypeRef(),
-            //     &mut out,
-            //     // block as ,
-            //     &*block as *const block::Block<_, _> as *mut std::ffi::c_void,
-            // ));
-            // extern "C" fn read_proc(
-            //     pktlist: *const coremidi_sys::MIDIPacketList,
-            //     read_proc_ref_con: *mut std::ffi::c_void,
-            //     _src_conn_ref_con: *mut std::ffi::c_void,
-            // ) {
-            //     println!("readproc");
-            // }
+    //         // os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
+    //         //     self.inner,
+    //         //     name.as_concrete_TypeRef(),
+    //         //     &mut out,
+    //         //     // std::mem::transmute(block)
+    //         //     block,
+    //         // ));
+    //         // coremidi_sys::MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
+    //         // let z: coremidi_sys::MIDIReadProc;
+    //         // os_assert(coremidi_sys::MIDIInputPortCreateWithBlock(
+    //         //     self.inner,
+    //         //     name.as_concrete_TypeRef(),
+    //         //     &mut out,
+    //         //     // block as ,
+    //         //     &*block as *const block::Block<_, _> as *mut std::ffi::c_void,
+    //         // ));
+    //         // extern "C" fn read_proc(
+    //         //     pktlist: *const coremidi_sys::MIDIPacketList,
+    //         //     read_proc_ref_con: *mut std::ffi::c_void,
+    //         //     _src_conn_ref_con: *mut std::ffi::c_void,
+    //         // ) {
+    //         //     println!("readproc");
+    //         // }
 
-            // os_assert(coremidi_sys::MIDIInputPortCreate(
-            //     self.inner,
-            //     name.as_concrete_TypeRef(),
-            //     // Some(Self::read_proc as extern "C" fn(_, _, _)),
-            //     Some(read_proc),
-            //     // box_callback.raw_ptr(),
-            //     std::ptr::null_mut(),
-            //     &mut out,
-            // ));
-        }
-        assert!(out != 0);
-        out
-    }
+    //         // os_assert(coremidi_sys::MIDIInputPortCreate(
+    //         //     self.inner,
+    //         //     name.as_concrete_TypeRef(),
+    //         //     // Some(Self::read_proc as extern "C" fn(_, _, _)),
+    //         //     Some(read_proc),
+    //         //     // box_callback.raw_ptr(),
+    //         //     std::ptr::null_mut(),
+    //         //     &mut out,
+    //         // ));
+    //     }
+    //     assert!(out != 0);
+    //     out
+    // }
 
-    fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
-        let mut out = 0;
-        unsafe {
-            use core_foundation::base::TCFType;
-            let name = core_foundation::string::CFString::new(name);
-            os_assert(coremidi_sys::MIDIOutputPortCreate(
-                self.inner,
-                name.as_concrete_TypeRef(),
-                &mut out,
-            ));
-        }
-        out
-    }
+    // fn create_output_port(&self, name: &str) -> coremidi_sys::MIDIPortRef {
+    //     let mut out = 0;
+    //     unsafe {
+    //         use core_foundation::base::TCFType;
+    //         let name = core_foundation::string::CFString::new(name);
+    //         os_assert(coremidi_sys::MIDIOutputPortCreate(
+    //             self.inner,
+    //             name.as_concrete_TypeRef(),
+    //             &mut out,
+    //         ));
+    //     }
+    //     out
+    // }
 }
 
 impl std::hash::Hash for MIDIClientImpl {
