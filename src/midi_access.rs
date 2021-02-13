@@ -10,7 +10,11 @@ pub struct MIDIAccess {
 
 impl MIDIAccess {
     pub fn new(name: &str, f: impl Fn(MIDINotification) -> ()) -> Self {
-        todo!()
+        // let access = MIDIAccessImpl::new(name, f);
+        // todo!()
+        Self {
+            inner:  std::sync::Arc::new(MIDIAccessImpl::new(name, f).into())
+        }
         // let (tx, rx) = std::sync::mpsc::channel();
 
         // let inner = std::sync::Arc::new(std::sync::Mutex::new(MIDIAccessImpl::new(name, tx)));
@@ -41,8 +45,8 @@ struct MIDIAccessImpl {
 impl MIDIAccessImpl {
     fn notification(&mut self, u: u32) {}
 
-    pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
-        let client = MIDIClient::new(name, tx);
+    pub fn new(name: &str, f: impl Fn(MIDINotification) -> ()) -> Self {
+        let client = MIDIClient::new(name, f);
         let inputs = MIDIPortMap::<MIDIInput>::new(&client);
         let outputs = MIDIPortMap::<MIDIOutput>::new(&client);
 

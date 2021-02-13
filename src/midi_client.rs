@@ -97,27 +97,28 @@ impl MIDIClient {
         todo!()
     }
 
-    pub fn new1(name: &str, f: impl Fn(MIDINotification)) -> Self {
+    pub fn new(name: &str, f: impl Fn(MIDINotification)) -> Self {
+        let inner = MIDIClientImpl::new(name, f);
         todo!()
     }
 
-    pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
-        todo!()
-        // let (tx, rx) = std::sync::mpsc::channel();
+    // pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
+    //     todo!()
+    //     // let (tx, rx) = std::sync::mpsc::channel();
 
-        // let client = MIDIClientImpl::new(name, tx);
-        // let hash = hash(&client);
-        // let inner = std::sync::Arc::new(std::sync::Mutex::new(client));
-        // // let clone = inner.clone();
-        // let self_ = Self { inner, hash };
-        // let mut clone = self_.clone();
-        // std::thread::spawn(move || {
-        //     let v = rx.recv().unwrap();
-        //     clone.notification(v);
-        // });
+    //     // let client = MIDIClientImpl::new(name, tx);
+    //     // let hash = hash(&client);
+    //     // let inner = std::sync::Arc::new(std::sync::Mutex::new(client));
+    //     // // let clone = inner.clone();
+    //     // let self_ = Self { inner, hash };
+    //     // let mut clone = self_.clone();
+    //     // std::thread::spawn(move || {
+    //     //     let v = rx.recv().unwrap();
+    //     //     clone.notification(v);
+    //     // });
 
-        // self_
-    }
+    //     // self_
+    // }
 
     // pub(crate) fn create_input_port(
     //     &self,
@@ -156,9 +157,9 @@ impl MIDIClientImpl {
 
     fn notification(&mut self, u: u32) {}
 
-    fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
+    fn new(name: &str, f: impl Fn(MIDINotification)) -> Self {
         Self {
-            inner: MIDIClientCreate(name, tx),
+            inner: MIDIClientCreate(name, f),
         }
     }
 
@@ -294,12 +295,12 @@ extern "C" {
     ) -> u32;
 }
 
-fn MIDIClientCreate(name: &str, tx: std::sync::mpsc::Sender<u32>) -> coremidi_sys::MIDIClientRef {
+fn MIDIClientCreate(name: &str, f: impl Fn(MIDINotification)) -> coremidi_sys::MIDIClientRef {
     let mut out = 0;
     unsafe {
         use core_foundation::base::TCFType;
         let block = block::ConcreteBlock::new(move |notification: u32| {
-            tx.send(10);
+            // f()
             // todo!();
         })
         .copy();
