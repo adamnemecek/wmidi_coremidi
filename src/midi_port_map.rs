@@ -39,7 +39,7 @@ impl MIDIPortMap<MIDIOutput> {
         // let a = MIDIPortMapImpl::<MIDIOutput>::new();
         // let inner = std::sync::Arc::new(a);
         Self {
-            inner: MIDIPortMapImpl::<MIDIOutput>::new().into(),
+            inner: MIDIPortMapImpl::<MIDIOutput>::new(client.clone()).into(),
         }
     }
 }
@@ -106,7 +106,7 @@ impl MIDIPortMapImpl<MIDIInput> {
 }
 
 impl MIDIPortMapImpl<MIDIOutput> {
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(client: MIDIClient) -> Self {
         let count = unsafe { coremidi_sys::MIDIGetNumberOfDestinations() } as _;
         let mut inner = std::collections::HashMap::with_capacity(count);
 
@@ -114,7 +114,7 @@ impl MIDIPortMapImpl<MIDIOutput> {
             for i in 0..count {
                 let endpoint = coremidi_sys::MIDIGetDestination(i as _);
                 assert!(endpoint != 0);
-                let output = MIDIOutput::new(MIDIEndpoint::new(endpoint));
+                let output = MIDIOutput::new(client.clone(), MIDIEndpoint::new(endpoint));
                 inner.insert(output.id(), output);
             }
         }

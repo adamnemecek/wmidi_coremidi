@@ -20,8 +20,11 @@ fn main() {
         println!("{:?}", p);
     }
 
-    let snoize = outputs.iter().find(|x| x.1.display_name().contains("Monitor"));
-    let snoize = snoize.unwrap().1.clone();
+    let snoize = outputs
+        .iter()
+        .find(|x| x.1.display_name().contains("Driver"));
+    let mut snoize = snoize.unwrap().1.clone();
+    snoize.send(&[0x90, 100, 100], None);
 
     // for (i, e) in outputs.iter() {
     //     println!("{:?}", e);

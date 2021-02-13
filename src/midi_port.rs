@@ -53,6 +53,6 @@ pub trait MIDIPort: Eq + Clone + std::hash::Hash + std::fmt::Debug {
     fn display_name(&self) -> &str;
     // fn kind(&self) ->
     fn connection(&self) -> MIDIPortConnectionState;
-    fn open(&self);
+    fn open(&mut self);
     fn close(&self);
 }

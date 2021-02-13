@@ -1,5 +1,7 @@
 use coremidi_sys::{
+    // MIDIOutputPortCreate,
     MIDIPacketList,
+    MIDIPortRef,
     MIDIReceived,
 };
 
@@ -12,8 +14,8 @@ pub struct MIDIOutput {
 }
 
 impl MIDIOutput {
-    pub(crate) fn new(endpoint: MIDIEndpoint) -> Self {
-        let inner = MIDIOutputImpl::new(endpoint);
+    pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
+        let inner = MIDIOutputImpl::new(client, endpoint);
         // let hash = crate::hash(&port);
         Self {
             // inner: std::sync::Arc::new(std::sync::Mutex::new(port)),
@@ -36,7 +38,7 @@ impl MIDIPort for MIDIOutput {
         self.inner.manufacturer()
     }
 
-    fn open(&self) {
+    fn open(&mut self) {
         self.inner.open()
     }
 
@@ -58,10 +60,6 @@ impl MIDIOutput {
     //     self.inner.name()
     // }
 
-    pub fn open(&mut self) {
-        self.inner.open();
-    }
-
     // fn close(&mut self) {
     //     self.inner.close();
     // }
@@ -70,7 +68,7 @@ impl MIDIOutput {
     //     self.inner.connection()
     // }
 
-    pub fn send(&self, data: &[u8], offset: impl Into<std::time::Duration>) {
+    pub fn send(&mut self, data: &[u8], offset: impl Into<Option<std::time::Duration>>) {
         self.inner.send(data, offset);
     }
 }
@@ -99,7 +97,7 @@ struct MIDIOutputImpl {
     // port_ref:
     port_ref: coremidi_sys::MIDIPortRef,
     on_state_change: Option<std::rc::Rc<dyn Fn(MIDIOutput) -> ()>>,
-    // client: MIDIClient,
+    client: MIDIClient,
 }
 
 impl PartialEq for MIDIOutputImpl {
@@ -111,9 +109,9 @@ impl PartialEq for MIDIOutputImpl {
 impl Eq for MIDIOutputImpl {}
 
 impl MIDIOutputImpl {
-    fn new(endpoint: MIDIEndpoint) -> Self {
+    fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
         Self {
-            // client,
+            client,
             endpoint,
             port_ref: 0,
             on_state_change: None,
@@ -140,6 +138,30 @@ impl std::hash::Hash for MIDIOutputImpl {
     }
 }
 
+// @inline(__always) fileprivate
+// func MIDIOutputPortCreate(ref: MIDIClientRef) -> MIDIPortRef {
+//     var port = MIDIPortRef()
+//     OSAssert(MIDIOutputPortCreate(ref, "MIDI output" as CFString, &port))
+//     return port
+// }
+
+fn MIDIOutputPortCreate(
+    client_ref: coremidi_sys::MIDIClientRef,
+    name: &str,
+) -> coremidi_sys::MIDIPortRef {
+    use core_foundation::base::TCFType;
+    let mut out = 0;
+    let name = core_foundation::string::CFString::new(name);
+    unsafe {
+        os_assert(coremidi_sys::MIDIOutputPortCreate(
+            client_ref,
+            name.as_concrete_TypeRef(),
+            &mut out,
+        ));
+    }
+    out
+}
+
 impl MIDIOutputImpl {
     fn connection(&self) -> MIDIPortConnectionState {
         if self.port_ref == 0 {
@@ -149,7 +171,8 @@ impl MIDIOutputImpl {
         }
     }
 
-    fn open(&self) {
+    fn open(&mut self) {
+        self.port_ref = MIDIOutputPortCreate(self.client.inner(), "MIDI Output");
         // self.inner.open()
     }
 
@@ -183,7 +206,7 @@ impl MIDIOutputImpl {
     // public func clear() {
     //     endpoint.flush()
     // }
-    pub fn send(&self, data: &[u8], offset: impl Into<std::time::Duration>) {
+    pub fn send(&mut self, data: &[u8], offset: impl Into<Option<std::time::Duration>>) {
         self.open();
         // _ = offset.map {
         //     // NOTE: AudioGetCurrentHostTime() CoreAudio method is only available on macOS
@@ -255,7 +278,7 @@ impl MIDIOutputImpl {
         self.endpoint.flush();
         self.port_ref = 0;
         if let Some(ref on_state_change) = self.on_state_change {
-            on_state_change(MIDIOutput::new(self.endpoint.clone()))
+            on_state_change(MIDIOutput::new(self.client.clone(), self.endpoint.clone()))
         }
         self.on_state_change = None;
     }

@@ -75,7 +75,7 @@ impl MIDIPort for MIDIInput {
         todo!()
     }
 
-    fn open(&self) {}
+    fn open(&mut self) {}
 
     fn connection(&self) -> MIDIPortConnectionState {
         self.inner.connection()
