@@ -20,15 +20,21 @@ fn main() {
         println!("{:?}", p);
     }
 
+    let inputs: Vec<_> = access.inputs().iter().collect();
+    for (_, p) in inputs.iter() {
+        println!("{:?}", p);
+    }
+
     let outputs = outputs
         .iter()
         .find(|x| x.1.display_name().contains("Driver"));
     let mut output = outputs.unwrap().1.clone();
 
     let input = access.input_for(&output);
-    input.unwrap().set_on_midi_message(|x| {
+    println!("input {:?}", input);
+    input.unwrap().set_on_midi_message(std::rc::Rc::new(|x| {
         println!("received msg");
-    });
+    }));
     output.send(&[0x90, 100, 100], None);
 
     // for (i, e) in outputs.iter() {

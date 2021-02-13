@@ -36,9 +36,6 @@ impl MIDIInput {
 
     pub fn set_on_midi_message(&mut self, f: MIDIInputFn) {
         self.inner.set_on_midi_message(f)
-        // close();
-
-        // open();
     }
 
     // pub fn receiver(&self) -> MIDIReceiver {

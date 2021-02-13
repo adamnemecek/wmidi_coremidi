@@ -72,9 +72,9 @@ impl MIDIAccessImpl {
     }
 
     fn input_for(&self, output: &MIDIOutput) -> Option<MIDIInput> {
-        self.inputs()
+        self.inputs
             .iter()
-            .find(|(id, input)| input.id() == output.id())
+            .find(|(_, input)| input.display_name() == output.display_name())
             .map(|(_, port)| port)
     }
 
@@ -85,7 +85,7 @@ impl MIDIAccessImpl {
     fn output_for(&self, input: &MIDIInput) -> Option<MIDIOutput> {
         self.outputs
             .iter()
-            .find(|(id, output)| output.id() == input.id())
+            .find(|(_, output)| output.display_name() == input.display_name())
             .map(|(_, port)| port)
     }
 }
