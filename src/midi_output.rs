@@ -299,6 +299,7 @@ impl std::fmt::Display for MIDIOutputImpl {
 // return "\(type) \(name) by \(manufacturer), connection: \(connection) (id: \(id))"
 
 impl std::fmt::Debug for MIDIOutputImpl {
+    // todo: why does it crash on manufacturer?
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
