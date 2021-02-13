@@ -78,12 +78,12 @@ pub(crate) fn hash<T: std::hash::Hash>(v: &T) -> u64 {
 // needs to be arc so that it
 pub(crate) struct MIDIClient {
     inner: std::rc::Rc<MIDIClientImpl>,
-    hash: u64,
+    // hash: u64,
 }
 
 impl PartialEq for MIDIClient {
     fn eq(&self, other: &Self) -> bool {
-        self.hash == other.hash
+        self.inner == other.inner
     }
 }
 
@@ -102,7 +102,9 @@ impl MIDIClient {
 
     pub fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
         let inner = MIDIClientImpl::new(name, f);
-        todo!()
+        Self {
+            inner: inner.into()
+        }
     }
 
     // pub fn new(name: &str, tx: std::sync::mpsc::Sender<u32>) -> Self {
