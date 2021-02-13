@@ -290,27 +290,25 @@ impl Drop for MIDIClientImpl {
     }
 }
 
+#[allow(improper_ctypes)]
 extern "C" {
     pub fn MIDIClientCreateWithBlock(
         portName: *const core_foundation::string::__CFString,
         outClient: *mut coremidi_sys::MIDIClientRef,
         notifyBlock: block::RcBlock<(coremidi_sys::MIDINotification,), ()>,
-    ) -> u32;
+    ) -> coremidi_sys::OSStatus;
 }
 
+#[allow(non_snake_case)]
 fn MIDIClientCreate(
     name: &str,
     f: impl Fn(MIDINotification) -> () + 'static,
 ) -> coremidi_sys::MIDIClientRef {
     let mut out = 0;
     unsafe {
-        // use core_foundation::base::TCFType;
         let block =
             block::ConcreteBlock::new(move |notification: coremidi_sys::MIDINotification| {
-                // f()
-                // todo!();
-                let n = MIDINotification::new(notification);
-                if let Some(n) = n {
+                if let Some(n) = MIDINotification::new(notification) {
                     f(n);
                 }
             })
@@ -321,7 +319,11 @@ fn MIDIClientCreate(
         //     &mut out,
         //     std::mem::transmute(block),
         // ));
-        MIDIClientCreateWithBlock(name.as_concrete_TypeRef(), &mut out, block);
+        os_assert(MIDIClientCreateWithBlock(
+            name.as_concrete_TypeRef(),
+            &mut out,
+            block,
+        ));
     }
     out
 }
