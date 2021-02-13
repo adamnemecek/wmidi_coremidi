@@ -13,7 +13,7 @@ impl MIDIAccess {
         // let access = MIDIAccessImpl::new(name, f);
         // todo!()
         Self {
-            inner:  std::sync::Arc::new(MIDIAccessImpl::new(name, f).into())
+            inner: std::sync::Arc::new(MIDIAccessImpl::new(name, f).into()),
         }
         // let (tx, rx) = std::sync::mpsc::channel();
 

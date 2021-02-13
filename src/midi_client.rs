@@ -1,10 +1,8 @@
-use core_foundation::base::TCFType;
-use coremidi_sys::{
-    MIDIClientRef,
-    MIDIReadBlock,
-    MIDIReadProc,
-    MIDITimeStamp,
+use core_foundation::base::{
+    OSStatus,
+    TCFType,
 };
+use coremidi_sys::{MIDIClientRef, MIDIReadBlock, MIDIReadProc, MIDITimeStamp};
 
 use crate::prelude::*;
 
@@ -291,25 +289,27 @@ extern "C" {
     pub fn MIDIClientCreateWithBlock(
         portName: *const core_foundation::string::__CFString,
         outClient: *mut coremidi_sys::MIDIClientRef,
-        notifyBlock: block::Block<(), ()>,
+        notifyBlock: block::RcBlock<(coremidi_sys::MIDINotification,), ()>,
     ) -> u32;
 }
 
 fn MIDIClientCreate(name: &str, f: impl Fn(MIDINotification)) -> coremidi_sys::MIDIClientRef {
     let mut out = 0;
     unsafe {
-        use core_foundation::base::TCFType;
-        let block = block::ConcreteBlock::new(move |notification: u32| {
+        // use core_foundation::base::TCFType;
+        let block = block::ConcreteBlock::new(move |notification: coremidi_sys::MIDINotification| {
             // f()
             // todo!();
+
         })
         .copy();
         let name = core_foundation::string::CFString::new(name);
-        os_assert(coremidi_sys::MIDIClientCreateWithBlock(
-            name.as_concrete_TypeRef(),
-            &mut out,
-            std::mem::transmute(block),
-        ));
+        // os_assert(coremidi_sys::MIDIClientCreateWithBlock(
+        //     name.as_concrete_TypeRef(),
+        //     &mut out,
+        //     std::mem::transmute(block),
+        // ));
+        MIDIClientCreateWithBlock(name.as_concrete_TypeRef(), &mut out, block);
     }
     out
 }
