@@ -1,3 +1,8 @@
+use coremidi_sys::{
+    MIDIPacketList,
+    MIDIReceived,
+};
+
 use crate::prelude::*;
 
 #[derive(Clone, PartialEq, Eq)]
@@ -175,10 +180,74 @@ impl MIDIOutputImpl {
     // self.endpoint.name()
     // }
 
-    // fn sender(&self) -> MIDISender {
-    //     let port = self.client.create_output_port("");
-    //     MIDISender::new(&self.client, self.endpoint.clone(), port)
+    // public func send<S: Sequence>(_ data: S, offset: Double? = nil) -> MIDIOutput where S.Iterator.Element == UInt8 {
+    //     open()
+    //     var lst = MIDIPacketList(data)
+    //     lst.send(to: self, offset: offset)
+
+    //     return self
     // }
+
+    // public func clear() {
+    //     endpoint.flush()
+    // }
+    pub fn send(&self, data: &[u8], offset: impl Into<std::time::Duration>) {
+        self.open();
+        // _ = offset.map {
+        //     // NOTE: AudioGetCurrentHostTime() CoreAudio method is only available on macOS
+        //     let current = AudioGetCurrentHostTime()
+        //     let _offset = AudioConvertNanosToHostTime(UInt64($0 * 1000000))
+
+        //     let ts = current + _offset
+        //     packet.timeStamp = ts
+        // }
+        // let timestamp =
+        // let d: std::time::Duration = offset.into();
+        // let timestamp = offset.into();
+        // d
+
+        // OSAssert(MIDISend(output.ref, output.endpoint.ref, &self))
+        // /// this let's us propagate the events to everyone subscribed to this
+        // /// endpoint not just this port, i'm not sure if we actually want this
+        // /// but for now, it let's us create multiple ports from different MIDIAccess
+        // /// objects and have them all receive the same messages
+        // OSAssert(MIDIReceived(output.endpoint.ref, &self))
+        let mut d = [0; 256];
+        unsafe {
+            data.as_ptr()
+                .copy_to_nonoverlapping(d.as_mut_ptr(), data.len());
+        }
+
+        let packet = coremidi_sys::MIDIPacket {
+            timeStamp: 0,
+            length: data.len() as _,
+            data: d,
+            __padding: [0; 2],
+        };
+        let packet_list = coremidi_sys::MIDIPacketList {
+            numPackets: 1,
+            packet: [packet; 1],
+        };
+        unsafe {
+            os_assert(coremidi_sys::MIDISend(
+                self.port_ref,
+                self.endpoint.inner(),
+                &packet_list,
+            ));
+
+            os_assert(coremidi_sys::MIDIReceived(
+                self.endpoint.inner(),
+                &packet_list,
+            ));
+        };
+
+        // let port = self.client.create_output_port("");
+        // MIDISender::new(&self.client, self.endpoint.clone(), port)
+    }
+
+    pub fn clear(&self) {
+        self.endpoint.flush();
+    }
 
     // fn open(&mut self) {
     //     if self.connection() == MIDIPortConnectionState::Open {
