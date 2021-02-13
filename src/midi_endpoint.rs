@@ -189,7 +189,7 @@ impl MIDIEndpointImpl {
             let s = s.assume_init();
             let len = CFStringGetLength(s);
             let data = CFStringGetCStringPtr(s, kCFStringEncodingUTF8) as *const u8;
-            debug_assert!(!data.is_null());
+            // assert!(!data.is_null());
             let slice = std::slice::from_raw_parts(data, len as _);
             std::str::from_utf8(slice).unwrap()
         }
