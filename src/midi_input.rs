@@ -34,7 +34,8 @@ impl MIDIInput {
         }
     }
 
-    pub fn set_on_midi_message(&mut self, f: impl Fn(MIDIEvent) -> ()) {
+    pub fn set_on_midi_message(&mut self, f: MIDIInputFn) {
+        self.inner.set_on_midi_message(f)
         // close();
 
         // open();
@@ -135,11 +136,11 @@ impl MIDIInputImpl {
     }
 
     fn open(&mut self) {
-        if self.connection() == MIDIPortConnectionState::Closed {
+        if self.connection() == MIDIPortConnectionState::Open {
             return;
         }
         let input_fn = self.input_fn.clone();
-        self.port_ref = MIDIInputPortCreate(self.client.inner(), "", move |event| {
+        self.port_ref = midi_input_port_create(self.client.inner(), "", move |event| {
             //
             if let Some(ref input_fn) = input_fn {
                 input_fn(event);
@@ -189,9 +190,9 @@ impl MIDIInputImpl {
         // onStateChange = nil
     }
 
-    fn set_on_midi_message(&mut self, input_fn: impl Into<Option<MIDIInputFn>>) {
+    fn set_on_midi_message(&mut self, input_fn: MIDIInputFn) {
         self.close();
-        self.input_fn = input_fn.into();
+        self.input_fn = Some(input_fn);
         self.open();
     }
 
@@ -252,7 +253,7 @@ extern "C" {
     ) -> i32;
 }
 
-fn MIDIInputPortCreate(
+fn midi_input_port_create(
     client: u32,
     name: &str,
     f: impl Fn(&MIDIEvent) -> () + 'static,

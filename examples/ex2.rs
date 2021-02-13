@@ -26,6 +26,9 @@ fn main() {
     let mut output = outputs.unwrap().1.clone();
 
     let input = access.input_for(&output);
+    input.unwrap().set_on_midi_message(|x| {
+        println!("received msg");
+    });
     output.send(&[0x90, 100, 100], None);
 
     // for (i, e) in outputs.iter() {
