@@ -271,12 +271,27 @@ impl MIDIOutputImpl {
 
 impl std::fmt::Display for MIDIOutputImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MIDIOutput")
+        write!(f, "{:?}", self)
     }
 }
 
+// let type: String
+// if self.type == .input {
+//     type = "MIDIInput"
+// } else {
+//     type = "MIDIOutput"
+// }
+// return "\(type) \(name) by \(manufacturer), connection: \(connection) (id: \(id))"
+
 impl std::fmt::Debug for MIDIOutputImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MIDIOutput")
+        write!(
+            f,
+            "MIDIOutput {{ name {:?} by {:?} connection: {:?}, id: {:?} }}",
+            self.display_name(),
+            self.manufacturer(),
+            self.connection(),
+            self.id()
+        )
     }
 }

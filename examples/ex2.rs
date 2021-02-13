@@ -14,7 +14,12 @@ fn main() {
     // }
 
     let outputs: Vec<_> = access.outputs().iter().collect();
-    let (_, output) = outputs.first().unwrap();
+    // let (_, output) = outputs.first().unwrap();
+    // output.
+
+    for (i, e) in outputs.iter() {
+        println!("{:?}", e);
+    }
 
     // let input = res.unwrap().1;
 
