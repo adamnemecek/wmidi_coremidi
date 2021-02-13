@@ -219,32 +219,36 @@ extern "C" {
     ) -> i32;
 }
 
-fn MIDIInputPortCreate(client: u32, name: &str, f: impl FnMut(&MIDIEvent)) -> Option<u32> {
+fn MIDIInputPortCreate(
+    client: u32,
+    name: &str,
+    f: impl Fn(&MIDIEvent) -> () + 'static,
+) -> Option<u32> {
     use core_foundation::base::TCFType;
-    let mut block = block::ConcreteBlock::new(
+    let block = block::ConcreteBlock::new(
         move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
-            // let i = MIDIPacketListIterator
-            todo!("input block");
-            // todo!();
-            // let i = MIDIPacketListIterator::new(unsafe { packet.as_ref().unwrap() });
-            // let p = MIDIPacket::new(0, &[1,2,3]);
-            // tx.send(p);
-            // println!("here");
-            // for e in i {
-            //     let packet = MIDIPacket::from(e);
-            //     let _ = tx.send(packet);
-            // }
+            let packet = unsafe { packet.as_ref().unwrap() };
+            let mut i = MIDIPacketListIterator::new(packet);
+            while let Some(ref next) = i.next() {
+                f(next);
+            }
         },
     )
     .copy();
+
     let name = core_foundation::string::CFString::new(name);
     let mut out = 0;
-    let err = unsafe {
-        MIDIInputPortCreateWithBlock(client, name.as_concrete_TypeRef(), &mut out, block)
-    };
-    if err == 0 {
-        Some(out)
-    } else {
-        None
+    unsafe {
+        os_assert(MIDIInputPortCreateWithBlock(
+            client,
+            name.as_concrete_TypeRef(),
+            &mut out,
+            block,
+        ));
     }
+    // if err == 0 {
+    Some(out)
+    // } else {
+    // None
+    // }
 }
