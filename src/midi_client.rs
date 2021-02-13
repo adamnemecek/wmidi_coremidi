@@ -2,7 +2,12 @@ use core_foundation::base::{
     OSStatus,
     TCFType,
 };
-use coremidi_sys::{MIDIClientRef, MIDIReadBlock, MIDIReadProc, MIDITimeStamp};
+use coremidi_sys::{
+    MIDIClientRef,
+    MIDIReadBlock,
+    MIDIReadProc,
+    MIDITimeStamp,
+};
 
 use crate::prelude::*;
 
@@ -95,7 +100,7 @@ impl MIDIClient {
         todo!()
     }
 
-    pub fn new(name: &str, f: impl Fn(MIDINotification)) -> Self {
+    pub fn new(name: &str, f: impl Fn(MIDINotification) + 'static) -> Self {
         let inner = MIDIClientImpl::new(name, f);
         todo!()
     }
@@ -155,7 +160,7 @@ impl MIDIClientImpl {
 
     fn notification(&mut self, u: u32) {}
 
-    fn new(name: &str, f: impl Fn(MIDINotification)) -> Self {
+    fn new(name: &str, f: impl Fn(MIDINotification) + 'static) -> Self {
         Self {
             inner: MIDIClientCreate(name, f),
         }
@@ -293,16 +298,23 @@ extern "C" {
     ) -> u32;
 }
 
-fn MIDIClientCreate(name: &str, f: impl Fn(MIDINotification)) -> coremidi_sys::MIDIClientRef {
+fn MIDIClientCreate(
+    name: &str,
+    f: impl Fn(MIDINotification) + 'static,
+) -> coremidi_sys::MIDIClientRef {
     let mut out = 0;
     unsafe {
         // use core_foundation::base::TCFType;
-        let block = block::ConcreteBlock::new(move |notification: coremidi_sys::MIDINotification| {
-            // f()
-            // todo!();
-
-        })
-        .copy();
+        let block =
+            block::ConcreteBlock::new(move |notification: coremidi_sys::MIDINotification| {
+                // f()
+                // todo!();
+                let n = MIDINotification::new(notification);
+                if let Some(n) = n {
+                    f(n);
+                }
+            })
+            .copy();
         let name = core_foundation::string::CFString::new(name);
         // os_assert(coremidi_sys::MIDIClientCreateWithBlock(
         //     name.as_concrete_TypeRef(),

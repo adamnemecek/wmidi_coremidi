@@ -11,7 +11,7 @@ pub enum MIDINotification {
 // }
 
 impl MIDINotification {
-    fn new(a: coremidi_sys::MIDINotification) -> Option<Self> {
+    pub fn new(a: coremidi_sys::MIDINotification) -> Option<Self> {
         todo!()
     }
 }

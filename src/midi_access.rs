@@ -9,7 +9,7 @@ pub struct MIDIAccess {
 }
 
 impl MIDIAccess {
-    pub fn new(name: &str, f: impl Fn(MIDINotification) -> ()) -> Self {
+    pub fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
         // let access = MIDIAccessImpl::new(name, f);
         // todo!()
         Self {
@@ -45,7 +45,7 @@ struct MIDIAccessImpl {
 impl MIDIAccessImpl {
     fn notification(&mut self, u: u32) {}
 
-    pub fn new(name: &str, f: impl Fn(MIDINotification) -> ()) -> Self {
+    pub fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
         let client = MIDIClient::new(name, f);
         let inputs = MIDIPortMap::<MIDIInput>::new(&client);
         let outputs = MIDIPortMap::<MIDIOutput>::new(&client);
