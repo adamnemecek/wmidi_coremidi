@@ -75,13 +75,14 @@ impl MIDIPort for MIDIInput {
 }
 
 pub type MIDIInputFn = std::rc::Rc<dyn for<'r, 's> Fn(&'r MIDIEvent<'s>) -> ()>;
+// pub type MIDIChangeFn = std::rc::Rc<dyn
 
 #[derive(Clone)]
 struct MIDIInputImpl {
     client: MIDIClient,
     endpoint: MIDIEndpoint,
     port_ref: coremidi_sys::MIDIPortRef,
-    f: Option<MIDIInputFn>,
+    input_fn: Option<MIDIInputFn>,
 }
 // analogous to
 
@@ -100,7 +101,7 @@ impl MIDIInputImpl {
         Self {
             client,
             endpoint,
-            f: None,
+            input_fn: None,
             port_ref: 0,
         }
     }
@@ -121,11 +122,11 @@ impl MIDIInputImpl {
         if self.connection() == MIDIPortConnectionState::Closed {
             return;
         }
-        let f = self.f.clone();
+        let input_fn = self.input_fn.clone();
         self.port_ref = MIDIInputPortCreate(self.client.inner(), "", move |event| {
             //
-            if let Some(ref f) = f {
-                f(event);
+            if let Some(ref input_fn) = input_fn {
+                input_fn(event);
             }
         })
         .unwrap();
@@ -172,9 +173,9 @@ impl MIDIInputImpl {
         // onStateChange = nil
     }
 
-    fn set_on_midi_message(&mut self, f: impl Into<Option<MIDIInputFn>>) {
+    fn set_on_midi_message(&mut self, input_fn: impl Into<Option<MIDIInputFn>>) {
         self.close();
-        self.f = f.into();
+        self.input_fn = input_fn.into();
         self.open();
     }
 
