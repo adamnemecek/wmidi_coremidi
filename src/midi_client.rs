@@ -100,7 +100,7 @@ impl MIDIClient {
         todo!()
     }
 
-    pub fn new(name: &str, f: impl Fn(MIDINotification) + 'static) -> Self {
+    pub fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
         let inner = MIDIClientImpl::new(name, f);
         todo!()
     }
@@ -160,7 +160,7 @@ impl MIDIClientImpl {
 
     fn notification(&mut self, u: u32) {}
 
-    fn new(name: &str, f: impl Fn(MIDINotification) + 'static) -> Self {
+    fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
         Self {
             inner: MIDIClientCreate(name, f),
         }
@@ -300,7 +300,7 @@ extern "C" {
 
 fn MIDIClientCreate(
     name: &str,
-    f: impl Fn(MIDINotification) + 'static,
+    f: impl Fn(MIDINotification) -> () + 'static,
 ) -> coremidi_sys::MIDIClientRef {
     let mut out = 0;
     unsafe {
