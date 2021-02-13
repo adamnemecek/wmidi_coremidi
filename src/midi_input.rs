@@ -244,6 +244,8 @@ impl std::hash::Hash for MIDIInputImpl {
 
 // }
 
+pub type MIDIReadBlock = block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
+
 #[link(name = "CoreMIDI", kind = "framework")]
 extern "C" {
     fn MIDIInputPortCreateWithBlock(
@@ -269,18 +271,19 @@ fn midi_input_port_create(
             //     f(next);
             // }
         },
-    );
-    // .copy();
+    );//.copy();
 
     let name = core_foundation::string::CFString::new(name);
     let mut out = 0;
+    let block_ref = &mut block;
     unsafe {
         os_assert(MIDIInputPortCreateWithBlock(
             client,
             name.as_concrete_TypeRef(),
             &mut out,
             // &mut block.as_ptr(),
-            &mut *block,
+            block_ref as *const _ as *mut MIDIReadBlock,
+            
         ));
     }
     // if err == 0 {
