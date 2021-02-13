@@ -1,7 +1,4 @@
-use crate::{
-    prelude::*,
-    MIDIOutput,
-};
+use crate::prelude::*;
 
 pub struct MIDIPortMapImplIterator<'a, T: MIDIPort> {
     inner: std::collections::hash_map::Iter<'a, MIDIPortID, T>,
@@ -13,8 +10,9 @@ impl<'a, T: MIDIPort> Iterator for MIDIPortMapImplIterator<'a, T> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.inner.size_hint()
     }
+
     fn next(&mut self) -> Option<Self::Item> {
-        // self.inner.next()
+        // self.inner.next().map(|(id, port)| (*id, port))
         todo!()
     }
 }
