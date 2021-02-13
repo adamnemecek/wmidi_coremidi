@@ -21,7 +21,7 @@ impl<'a, T: MIDIPort> Iterator for MIDIPortMapImplIterator<'a, T> {
 
 #[derive(Clone)]
 pub struct MIDIPortMap<T: MIDIPort> {
-    inner: std::sync::Arc<MIDIPortMapImpl<T>>,
+    inner: std::rc::Rc<MIDIPortMapImpl<T>>,
 }
 
 impl<T: MIDIPort> MIDIPortMap<T> {
@@ -31,17 +31,19 @@ impl<T: MIDIPort> MIDIPortMap<T> {
 }
 impl MIDIPortMap<MIDIInput> {
     pub(crate) fn new(client: &MIDIClient) -> Self {
-        let a = MIDIPortMapImpl::<MIDIInput>::new(client.clone());
-        let inner = std::sync::Arc::new(a);
-        Self { inner }
+        Self {
+            inner: MIDIPortMapImpl::<MIDIInput>::new(client.clone()).into(),
+        }
     }
 }
 
 impl MIDIPortMap<MIDIOutput> {
     pub(crate) fn new(client: &MIDIClient) -> Self {
-        let a = MIDIPortMapImpl::<MIDIOutput>::new();
-        let inner = std::sync::Arc::new(a);
-        Self { inner }
+        // let a = MIDIPortMapImpl::<MIDIOutput>::new();
+        // let inner = std::sync::Arc::new(a);
+        Self {
+            inner: MIDIPortMapImpl::<MIDIOutput>::new().into(),
+        }
     }
 }
 

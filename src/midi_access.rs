@@ -4,8 +4,8 @@ use crate::{
 };
 
 pub struct MIDIAccess {
-    // inner: std::rc::Rc<MIDIAccessImpl>,
-    inner: std::sync::Arc<std::sync::Mutex<MIDIAccessImpl>>,
+    inner: std::rc::Rc<MIDIAccessImpl>,
+    // inner: std::sync::Arc<std::sync::Mutex<MIDIAccessImpl>>,
 }
 
 impl MIDIAccess {
@@ -13,7 +13,7 @@ impl MIDIAccess {
         // let access = MIDIAccessImpl::new(name, f);
         // todo!()
         Self {
-            inner: std::sync::Arc::new(MIDIAccessImpl::new(name, f).into()),
+            inner: MIDIAccessImpl::new(name, f).into(),
         }
         // let (tx, rx) = std::sync::mpsc::channel();
 
@@ -28,11 +28,13 @@ impl MIDIAccess {
     }
 
     pub fn inputs(&self) -> MIDIPortMap<MIDIInput> {
-        self.inner.lock().unwrap().inputs()
+        // self.inner.lock().unwrap().inputs()
+        self.inner.inputs()
     }
 
     pub fn outputs(&self) -> MIDIPortMap<MIDIOutput> {
-        self.inner.lock().unwrap().outputs()
+        // self.inner.lock().unwrap().outputs()
+        self.inner.outputs()
     }
 }
 

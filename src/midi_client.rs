@@ -77,7 +77,7 @@ pub(crate) fn hash<T: std::hash::Hash>(v: &T) -> u64 {
 #[derive(Clone)]
 // needs to be arc so that it
 pub(crate) struct MIDIClient {
-    inner: std::sync::Arc<MIDIClientImpl>,
+    inner: std::rc::Rc<MIDIClientImpl>,
     hash: u64,
 }
 
