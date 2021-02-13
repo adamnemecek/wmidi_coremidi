@@ -44,9 +44,9 @@ extern "C" {
         client: u32,
         portName: *const core_foundation::string::__CFString,
         outPort: *mut u32,
-        readBlock: &MIDIReadBlock,
+        readBlock: MIDIReadBlock,
         // read_block: *mut std::ffi:c_void
-    ) -> i32;
+    ) -> coremidi_sys::OSStatus;
     // fn MIDIInputPortCreateWithBlock() {
 
     // }
