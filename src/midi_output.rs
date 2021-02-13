@@ -58,9 +58,9 @@ impl MIDIOutput {
     //     self.inner.name()
     // }
 
-    // fn open(&mut self) {
-    //     self.inner.open();
-    // }
+    pub fn open(&mut self) {
+        self.inner.open();
+    }
 
     // fn close(&mut self) {
     //     self.inner.close();
@@ -69,6 +69,10 @@ impl MIDIOutput {
     // fn connection(&self) -> MIDIPortConnectionState {
     //     self.inner.connection()
     // }
+
+    pub fn send(&self, data: &[u8], offset: impl Into<std::time::Duration>) {
+        self.inner.send(data, offset);
+    }
 }
 
 impl std::fmt::Display for MIDIOutput {

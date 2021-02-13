@@ -16,10 +16,16 @@ fn main() {
     let outputs: Vec<_> = access.outputs().iter().collect();
     // let (_, output) = outputs.first().unwrap();
     // output.
-
-    for (i, e) in outputs.iter() {
-        println!("{:?}", e);
+    for (_, p) in outputs.iter() {
+        println!("{:?}", p);
     }
+
+    let snoize = outputs.iter().find(|x| x.1.display_name().contains("Monitor"));
+    let snoize = snoize.unwrap().1.clone();
+
+    // for (i, e) in outputs.iter() {
+    //     println!("{:?}", e);
+    // }
 
     // let input = res.unwrap().1;
 
