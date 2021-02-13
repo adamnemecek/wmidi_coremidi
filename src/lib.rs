@@ -1,4 +1,5 @@
 #![feature(negative_impls)]
+#![deny(unconditional_recursion)]
 
 pub mod prelude;
 

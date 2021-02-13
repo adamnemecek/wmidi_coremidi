@@ -32,9 +32,17 @@ impl MIDIAccess {
         self.inner.inputs()
     }
 
+    pub fn input_for(&self, output: &MIDIOutput) -> Option<MIDIInput> {
+        self.inner.input_for(output)
+    }
+
     pub fn outputs(&self) -> MIDIPortMap<MIDIOutput> {
         // self.inner.lock().unwrap().outputs()
         self.inner.outputs()
+    }
+
+    pub fn output_for(&self, input: &MIDIInput) -> Option<MIDIOutput> {
+        self.inner.output_for(input)
     }
 }
 
@@ -47,7 +55,7 @@ struct MIDIAccessImpl {
 impl MIDIAccessImpl {
     fn notification(&mut self, u: u32) {}
 
-    pub fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
+    fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
         let client = MIDIClient::new(name, f);
         let inputs = MIDIPortMap::<MIDIInput>::new(&client);
         let outputs = MIDIPortMap::<MIDIOutput>::new(&client);
@@ -59,22 +67,22 @@ impl MIDIAccessImpl {
         }
     }
 
-    pub fn inputs(&self) -> MIDIPortMap<MIDIInput> {
+    fn inputs(&self) -> MIDIPortMap<MIDIInput> {
         self.inputs.clone()
     }
 
-    pub fn input_for(&self, output: &MIDIOutput) -> Option<MIDIInput> {
+    fn input_for(&self, output: &MIDIOutput) -> Option<MIDIInput> {
         self.inputs()
             .iter()
             .find(|(id, input)| input.id() == output.id())
             .map(|(_, port)| port)
     }
 
-    pub fn outputs(&self) -> MIDIPortMap<MIDIOutput> {
+    fn outputs(&self) -> MIDIPortMap<MIDIOutput> {
         self.outputs.clone()
     }
 
-    pub fn output_for(&self, input: &MIDIInput) -> Option<MIDIOutput> {
+    fn output_for(&self, input: &MIDIInput) -> Option<MIDIOutput> {
         self.outputs
             .iter()
             .find(|(id, output)| output.id() == input.id())

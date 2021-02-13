@@ -145,7 +145,7 @@ impl std::hash::Hash for MIDIOutputImpl {
 //     return port
 // }
 
-fn MIDIOutputPortCreate(
+fn midi_output_port_create(
     client_ref: coremidi_sys::MIDIClientRef,
     name: &str,
 ) -> coremidi_sys::MIDIPortRef {
@@ -172,7 +172,7 @@ impl MIDIOutputImpl {
     }
 
     fn open(&mut self) {
-        self.port_ref = MIDIOutputPortCreate(self.client.inner(), "MIDI Output");
+        self.port_ref = midi_output_port_create(self.client.inner(), "MIDI Output");
         // self.inner.open()
     }
 
