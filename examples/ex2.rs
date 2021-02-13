@@ -33,14 +33,14 @@ fn main() {
     let input = access.input_for(&output);
     println!("input {:?}", input);
     input.unwrap().set_on_midi_message(std::rc::Rc::new(|x| {
-        println!("received msg");
+        todo!("received msg");
     }));
     output.send(&[0x90, 100, 100], None);
 
     // for (i, e) in outputs.iter() {
     //     println!("{:?}", e);
     // }
-
+    std::thread::sleep(std::time::Duration::from_secs(2));
     // let input = res.unwrap().1;
 
     // let mut input = input.clone();

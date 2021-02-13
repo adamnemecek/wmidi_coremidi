@@ -239,6 +239,10 @@ impl std::hash::Hash for MIDIInputImpl {
         self.endpoint.id().hash(state)
     }
 }
+// #[repr(transparent)]
+// struct Block {
+
+// }
 
 #[link(name = "CoreMIDI", kind = "framework")]
 extern "C" {
@@ -246,7 +250,7 @@ extern "C" {
         client: u32,
         portName: *const core_foundation::string::__CFString,
         outPort: *mut u32,
-        readBlock: block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>,
+        readBlock: *mut block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>,
     ) -> i32;
 }
 
@@ -256,16 +260,17 @@ fn midi_input_port_create(
     f: impl Fn(&MIDIEvent) -> () + 'static,
 ) -> Option<u32> {
     use core_foundation::base::TCFType;
-    let block = block::ConcreteBlock::new(
+    let mut block = block::ConcreteBlock::new(
         move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
-            let packet = unsafe { packet.as_ref().unwrap() };
-            let mut i = MIDIPacketListIterator::new(packet);
-            while let Some(ref next) = i.next() {
-                f(next);
-            }
+            todo!("callback");
+            // let packet = unsafe { packet.as_ref().unwrap() };
+            // let mut i = MIDIPacketListIterator::new(packet);
+            // while let Some(ref next) = i.next() {
+            //     f(next);
+            // }
         },
-    )
-    .copy();
+    );
+    // .copy();
 
     let name = core_foundation::string::CFString::new(name);
     let mut out = 0;
@@ -274,7 +279,8 @@ fn midi_input_port_create(
             client,
             name.as_concrete_TypeRef(),
             &mut out,
-            block,
+            // &mut block.as_ptr(),
+            &mut *block,
         ));
     }
     // if err == 0 {
