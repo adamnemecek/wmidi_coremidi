@@ -119,7 +119,7 @@ impl MIDIInputImpl {
         if self.connection() == MIDIPortConnectionState::Closed {
             return;
         }
-        MIDIInputPortCreate(self.client.inner(), "", |event| {});
+        self.port_ref = MIDIInputPortCreate(self.client.inner(), "", |event| todo!()).unwrap();
 
         // MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
         // guard connection != .open else { return }
@@ -219,7 +219,7 @@ extern "C" {
     ) -> i32;
 }
 
-fn MIDIInputPortCreate(client: u32, name: &str, f: impl Fn(&[MIDIPacket])) -> Option<u32> {
+fn MIDIInputPortCreate(client: u32, name: &str, f: impl FnMut(&MIDIEvent)) -> Option<u32> {
     use core_foundation::base::TCFType;
     let mut block = block::ConcreteBlock::new(
         move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {

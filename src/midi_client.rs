@@ -10,12 +10,24 @@ use crate::prelude::*;
 
 // typealias MIDIReadBlock = (UnsafePointer<MIDIPacketList>, UnsafeMutableRawPointer?) -> Void
 
-pub struct MIDIEvent {}
-
-// pub struct MIDIEvent<'a> {
+// pub struct MIDIEvent {
 //     pub timestamp: coremidi_sys::MIDITimeStamp,
-//     pub data: &'a [u8],
+
 // }
+
+pub struct MIDIEvent<'a> {
+    pub timestamp: coremidi_sys::MIDITimeStamp,
+    pub data: &'a [u8],
+}
+
+impl<'a> MIDIEvent<'a> {
+    pub fn new(timestamp: coremidi_sys::MIDITimeStamp, data: &'a [u8]) -> Self {
+        Self {
+            timestamp,
+            data
+        }
+    }
+}
 
 // pub struct MIDIEventIterator<'a> {
 //     p: &'a std::marker::PhantomData<()>,
