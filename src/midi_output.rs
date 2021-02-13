@@ -11,14 +11,6 @@ pub struct MIDIOutput {
     // hash: u64,
 }
 
-// impl PartialEq for MIDIOutput {
-//     fn eq(&self, other: &Self) -> bool {
-//         self.hash == other.hash
-//     }
-// }
-
-// impl Eq for MIDIOutput {}
-
 impl MIDIOutput {
     pub(crate) fn new(endpoint: MIDIEndpoint) -> Self {
         let inner = MIDIOutputImpl::new(endpoint);
@@ -34,6 +26,14 @@ impl MIDIPort for MIDIOutput {
     fn id(&self) -> MIDIPortID {
         // MIDIPortID::new(self.inner.borrow().id())
         self.inner.id()
+    }
+
+    fn display_name(&self) -> &str {
+        self.inner.display_name()
+    }
+
+    fn manufacturer(&self) -> &str {
+        self.inner.manufacturer()
     }
 
     fn open(&self) {
@@ -53,18 +53,6 @@ impl MIDIOutput {
     // pub fn sender(&self) -> MIDISender {
     //     self.inner.sender()
     // }
-
-    // pub fn display_name1(&self) -> String {
-    //     self.inner.display_name1()
-    // }
-
-    pub fn display_name(&self) -> &str {
-        self.inner.display_name()
-    }
-
-    pub fn manufacturer(&self) -> &str {
-        self.inner.manufacturer()
-    }
 
     // pub fn name(&self) -> &str {
     //     self.inner.name()

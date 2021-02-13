@@ -63,6 +63,14 @@ impl MIDIPort for MIDIInput {
         // todo!()
     }
 
+    fn display_name(&self) -> &str {
+        self.inner.display_name()
+    }
+
+    fn manufacturer(&self) -> &str {
+        self.inner.manufacturer()
+    }
+
     fn close(&self) {
         todo!()
     }
@@ -104,6 +112,14 @@ impl MIDIInputImpl {
             input_fn: None,
             port_ref: 0,
         }
+    }
+
+    fn display_name(&self) -> &str {
+        self.endpoint.display_name()
+    }
+
+    fn manufacturer(&self) -> &str {
+        self.endpoint.manufacturer()
     }
 
     fn id(&self) -> MIDIPortID {
@@ -209,7 +225,14 @@ impl MIDIInputImpl {
 
 impl std::fmt::Debug for MIDIInputImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MIDIClientImpl {}", self.endpoint.display_name())
+        write!(
+            f,
+            "MIDIInput {{ name {:?} by {:?} connection: {:?}, id: {:?} }}",
+            self.display_name(),
+            self.manufacturer(),
+            self.connection(),
+            self.id()
+        )
     }
 }
 
