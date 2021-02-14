@@ -247,7 +247,7 @@ impl std::hash::Hash for MIDIInputImpl {
 // }
 
 pub type MIDIReadBlock =
-    block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
+    block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void, ), ()>;
 
 #[link(name = "CoreMIDI", kind = "framework")]
 extern "C" {
@@ -266,8 +266,9 @@ fn midi_input_port_create(
     f: impl Fn(&MIDIEvent) -> () + 'static,
 ) -> Option<u32> {
     use core_foundation::base::TCFType;
-    let block = block::ConcreteBlock::new(
-        move |packet: *const std::ffi::c_void, _: *mut std::ffi::c_void| {
+
+    let block: MIDIReadBlock = block::ConcreteBlock::new(
+        move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
             todo!("callback");
             // let packet = unsafe { packet.as_ref().unwrap() };
             // let mut i = MIDIPacketListIterator::new(packet);
