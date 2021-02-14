@@ -34,9 +34,6 @@ fn main() {
         dispatch_async(queue, dispatch_block);
     }
     loop {
-        unsafe {
-            // sleep(100);
-            std::thread::sleep(std::time::Duration::from_millis(100));
-        }
+        std::thread::sleep(std::time::Duration::from_millis(100));
     }
 }

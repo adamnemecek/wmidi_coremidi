@@ -43,7 +43,10 @@ fn main() {
     // for (i, e) in outputs.iter() {
     //     println!("{:?}", e);
     // }
-    std::thread::sleep(std::time::Duration::from_secs(2));
+    // std::thread::sleep(std::time::Duration::from_secs(2));
+    loop {
+        std::thread::sleep(std::time::Duration::from_millis(100));
+}
     // let input = res.unwrap().1;
 
     // let mut input = input.clone();
