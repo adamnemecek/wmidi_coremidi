@@ -1,6 +1,8 @@
+// #![feature(rustc_private)]
 pub type DispatchQueue = *mut std::ffi::c_void;
 pub type DispatchQueueAttr = *mut std::ffi::c_void;
 // use block::Block;
+// use std::libc::sleep;
 
 use block::{
     Block,
@@ -22,5 +24,19 @@ fn main() {
         )
     };
 
-    println!("hello");
+    // println!("hello");
+    let dispatch_block = block::ConcreteBlock::new(move || {
+        println!("dispatch block");
+    });
+    let dispatch_block = dispatch_block.copy();
+    let dispatch_block: &Block<(), ()> = &dispatch_block;
+    unsafe {
+        dispatch_async(queue, dispatch_block);
+    }
+    loop {
+        unsafe {
+            // sleep(100);
+            std::thread::sleep(std::time::Duration::from_millis(100));
+        }
+    }
 }
