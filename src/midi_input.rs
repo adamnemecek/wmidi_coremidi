@@ -247,7 +247,8 @@ impl std::hash::Hash for MIDIInputImpl {
 // }
 
 // pub type MIDIReadBlock = block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void, ), ()>;
-pub type MIDIReadBlock = block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
+pub type MIDIReadBlock =
+    block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
 
 #[link(name = "CoreMIDI", kind = "framework")]
 extern "C" {
