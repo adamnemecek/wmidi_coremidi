@@ -246,8 +246,8 @@ impl std::hash::Hash for MIDIInputImpl {
 
 // }
 
-pub type MIDIReadBlock =
-    block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void, ), ()>;
+// pub type MIDIReadBlock = block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void, ), ()>;
+pub type MIDIReadBlock = block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
 
 #[link(name = "CoreMIDI", kind = "framework")]
 extern "C" {
@@ -256,7 +256,8 @@ extern "C" {
         portName: *const core_foundation::string::__CFString,
         outPort: *mut u32,
         // readBlock: &block::Block<(*const std::ffi::c_void, *mut std::ffi::c_void), ()>,
-        readBlock: *const std::ffi::c_void,
+        // readBlock: *const std::ffi::c_void,
+        readBlock: &MIDIReadBlock,
     ) -> i32;
 }
 
@@ -267,7 +268,7 @@ fn midi_input_port_create(
 ) -> Option<u32> {
     use core_foundation::base::TCFType;
 
-    let block: MIDIReadBlock = block::ConcreteBlock::new(
+    let block = block::ConcreteBlock::new(
         move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
             todo!("callback");
             // let packet = unsafe { packet.as_ref().unwrap() };
@@ -297,7 +298,8 @@ fn midi_input_port_create(
             // block_ref as *mut std::ffi::c_void,
             // &cblock.copy(),
             // std::mem::transmute(cblock)
-            &*block as *const block::Block<_, _> as *const std::ffi::c_void,
+            // &*block as *const block::Block<_, _> as *const std::ffi::c_void,
+            &block,
         ));
     }
     assert!(out != 0);
