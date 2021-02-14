@@ -139,12 +139,11 @@ impl MIDIInputImpl {
         if self.connection() == MIDIPortConnectionState::Open {
             return;
         }
-        // let input_fn = self.input_fn.clone();
+        let input_fn = self.input_fn.clone();
         self.port_ref = midi_input_port_create(self.client.inner(), "", move |event| {
-            //
-            // if let Some(ref input_fn) = input_fn {
-            //     input_fn(event);
-            // }
+            if let Some(ref input_fn) = input_fn {
+                input_fn(event);
+            }
         });
         
         println!("opened");
@@ -280,13 +279,12 @@ fn midi_input_port_create(
     use core_foundation::base::TCFType;
 
     let block = block::ConcreteBlock::new(
-        move |packet: *const coremidi_sys::MIDIPacketList, ctx: *mut std::ffi::c_void| {
-            todo!("callback");
-            // let packet = unsafe { packet.as_ref().unwrap() };
-            // let mut i = MIDIPacketListIterator::new(packet);
-            // while let Some(ref next) = i.next() {
-            //     f(next);
-            // }
+        move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
+            let packet = unsafe { packet.as_ref().unwrap() };
+            let mut i = MIDIPacketListIterator::new(packet);
+            while let Some(ref next) = i.next() {
+                f(next);
+            }
         },
     );
     let block = block.copy();

@@ -18,6 +18,7 @@ use crate::prelude::*;
 
 // }
 
+#[derive(Debug)]
 pub struct MIDIEvent<'a> {
     pub timestamp: coremidi_sys::MIDITimeStamp,
     pub data: &'a [u8],
