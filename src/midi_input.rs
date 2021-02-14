@@ -71,7 +71,7 @@ impl MIDIPort for MIDIInput {
     }
 
     fn close(&mut self) {
-        todo!()
+        self.inner.close()
     }
 
     fn open(&mut self) {
@@ -90,7 +90,7 @@ pub type MIDIInputFn = std::rc::Rc<dyn for<'r, 's> Fn(&'r MIDIEvent<'s>) -> ()>;
 struct MIDIInputImpl {
     client: MIDIClient,
     endpoint: MIDIEndpoint,
-    port_ref: coremidi_sys::MIDIPortRef,
+    port_ref: Option<coremidi_sys::MIDIPortRef>,
     input_fn: Option<MIDIInputFn>,
 }
 // analogous to
@@ -111,7 +111,7 @@ impl MIDIInputImpl {
             client,
             endpoint,
             input_fn: None,
-            port_ref: 0,
+            port_ref: None,
         }
     }
 
@@ -128,7 +128,7 @@ impl MIDIInputImpl {
     }
 
     fn connection(&self) -> MIDIPortConnectionState {
-        if self.port_ref == 0 {
+        if self.port_ref.is_none() {
             MIDIPortConnectionState::Closed
         } else {
             MIDIPortConnectionState::Open
@@ -145,8 +145,8 @@ impl MIDIInputImpl {
             // if let Some(ref input_fn) = input_fn {
             //     input_fn(event);
             // }
-        })
-        .unwrap();
+        });
+        
         println!("opened");
 
         // MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
@@ -174,10 +174,10 @@ impl MIDIInputImpl {
             return;
         }
         unsafe {
-            coremidi_sys::MIDIPortDisconnectSource(self.port_ref, self.endpoint.inner());
+            os_assert(coremidi_sys::MIDIPortDisconnectSource(self.port_ref.unwrap(), self.endpoint.inner()));
         }
 
-        self.port_ref = 0;
+        self.port_ref = None;
 
         // switch type {
         // case .input:
