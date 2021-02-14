@@ -59,6 +59,10 @@ impl MIDIEndpoint {
         self.inner.manufacturer()
     }
 
+    pub fn name(&self) -> &str {
+        self.inner.name()
+    }
+
     pub fn display_name(&self) -> &str {
         self.inner.display_name()
     }
@@ -111,6 +115,22 @@ impl std::fmt::Debug for MIDIEndpointImpl {
         )
     }
 }
+
+// enum CoreMIDIProperty {
+//     UniqueID,
+//     Version,
+//     Manufacturer,
+// }
+
+// impl CoreMIDIProperty {
+//     pub unsafe fn raw(&self) -> *const core_foundation::string::__CFString {
+//         match self {
+//             Self::UniqueID => coremidi_sys::kMIDIPropertyUniqueID,
+//             Self::Version => coremidi_sys::kMIDIPropertyDriverVersion,
+//             Self::Manufacturer => coremidi_sys::kMIDIPropertyManufacturer,
+//         }
+//     }
+// }
 
 impl MIDIEndpointImpl {
     fn id(&self) -> MIDIPortID {
