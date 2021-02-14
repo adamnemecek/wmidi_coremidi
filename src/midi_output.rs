@@ -42,7 +42,7 @@ impl MIDIPort for MIDIOutput {
         self.inner.open()
     }
 
-    fn close(&self) {
+    fn close(&mut self) {
         todo!()
     }
 

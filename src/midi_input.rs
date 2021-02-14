@@ -70,11 +70,13 @@ impl MIDIPort for MIDIInput {
         self.inner.manufacturer()
     }
 
-    fn close(&self) {
+    fn close(&mut self) {
         todo!()
     }
 
-    fn open(&mut self) {}
+    fn open(&mut self) {
+        self.inner.open()
+    }
 
     fn connection(&self) -> MIDIPortConnectionState {
         self.inner.connection()
