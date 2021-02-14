@@ -32,9 +32,11 @@ fn main() {
 
     let mut input = access.input_for(&output).unwrap();
 
-    input.set_on_midi_message(std::rc::Rc::new(|x| {
-        todo!("received msg");
-    }));
+    // input.set_on_midi_message(std::rc::Rc::new(|x| {
+    //     todo!("received msg");
+    // }));
+    // output.open();
+    input.open();
     println!("input {:?}", input);
     output.send(&[0x90, 100, 100], None);
 

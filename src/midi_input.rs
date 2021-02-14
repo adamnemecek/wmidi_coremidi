@@ -137,12 +137,12 @@ impl MIDIInputImpl {
         if self.connection() == MIDIPortConnectionState::Open {
             return;
         }
-        let input_fn = self.input_fn.clone();
+        // let input_fn = self.input_fn.clone();
         self.port_ref = midi_input_port_create(self.client.inner(), "", move |event| {
             //
-            if let Some(ref input_fn) = input_fn {
-                input_fn(event);
-            }
+            // if let Some(ref input_fn) = input_fn {
+            //     input_fn(event);
+            // }
         })
         .unwrap();
         println!("opened");
