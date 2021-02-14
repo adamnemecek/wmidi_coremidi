@@ -35,7 +35,7 @@ impl MIDIPort for MIDIOutput {
     }
 
     fn name(&self) -> &str {
-        todo!()
+        self.inner.name()
     }
 
     fn display_name(&self) -> &str {
@@ -185,6 +185,10 @@ impl MIDIOutputImpl {
 
     fn id(&self) -> MIDIPortID {
         self.endpoint.id()
+    }
+
+    fn name(&self) -> &str {
+        self.endpoint.name()
     }
 
     fn display_name(&self) -> &str {

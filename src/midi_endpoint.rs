@@ -48,7 +48,7 @@ impl MIDIEndpoint {
     }
 
     pub fn flush(&self) {
-        todo!()
+        self.inner.flush();
     }
 
     pub fn id(&self) -> MIDIPortID {

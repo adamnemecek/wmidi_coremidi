@@ -63,7 +63,7 @@ impl MIDIPort for MIDIInput {
     }
 
     fn name(&self) -> &str {
-        todo!()
+        self.inner.name()
     }
 
     fn kind(&self) -> MIDIPortKind {
@@ -123,6 +123,10 @@ impl MIDIInputImpl {
         }
     }
 
+    fn name(&self) -> &str {
+        self.endpoint.name()
+    }
+
     fn display_name(&self) -> &str {
         self.endpoint.display_name()
     }
@@ -153,7 +157,7 @@ impl MIDIInputImpl {
                 input_fn(event);
             }
         });
-        
+
         println!("opened");
 
         unsafe {
@@ -189,7 +193,10 @@ impl MIDIInputImpl {
             return;
         }
         unsafe {
-            os_assert(coremidi_sys::MIDIPortDisconnectSource(self.port_ref.unwrap(), self.endpoint.inner()));
+            os_assert(coremidi_sys::MIDIPortDisconnectSource(
+                self.port_ref.unwrap(),
+                self.endpoint.inner(),
+            ));
         }
 
         self.port_ref = None;
@@ -294,7 +301,8 @@ fn midi_input_port_create(
                 f(next);
             }
         },
-    ).copy();
+    )
+    .copy();
     // let block = block.copy();
     // let b: &MIDIReadBlock = &block;
     // .copy();
