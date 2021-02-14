@@ -270,7 +270,7 @@ fn midi_input_port_create(
     use core_foundation::base::TCFType;
 
     let block = block::ConcreteBlock::new(
-        move |packet: *const coremidi_sys::MIDIPacketList, _: *mut std::ffi::c_void| {
+        move |packet: *const coremidi_sys::MIDIPacketList, ctx: *mut std::ffi::c_void| {
             todo!("callback");
             // let packet = unsafe { packet.as_ref().unwrap() };
             // let mut i = MIDIPacketListIterator::new(packet);
@@ -278,8 +278,10 @@ fn midi_input_port_create(
             //     f(next);
             // }
         },
-    )
-    .copy();
+    );
+    let block = block.copy();
+    let b: &MIDIReadBlock = &block;
+    // .copy();
 
     // let block = & *cblock.copy();
     // unsafe { CFRunLoopPerformBlock(run_loop_ref as *mut c_void, kCFRunLoopDefaultMode, block); }
@@ -300,7 +302,7 @@ fn midi_input_port_create(
             // &cblock.copy(),
             // std::mem::transmute(cblock)
             // &*block as *const block::Block<_, _> as *const std::ffi::c_void,
-            &block,
+            b,
         ));
     }
     assert!(out != 0);
