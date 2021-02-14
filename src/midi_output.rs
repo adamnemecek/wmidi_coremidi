@@ -303,9 +303,9 @@ impl std::fmt::Debug for MIDIOutputImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "MIDIOutput {{ name {:?} by  connection: {:?}, id: {:?} }}",
+            "MIDIOutput {{ name {:?} by {:?} connection: {:?}, id: {:?} }}",
             self.display_name(),
-            // self.manufacturer(),
+            self.manufacturer(),
             self.connection(),
             self.id()
         )

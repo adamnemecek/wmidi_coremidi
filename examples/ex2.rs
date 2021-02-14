@@ -30,11 +30,12 @@ fn main() {
         .find(|x| x.1.display_name().contains("Driver"));
     let mut output = outputs.unwrap().1.clone();
 
-    let input = access.input_for(&output);
-    println!("input {:?}", input);
-    input.unwrap().set_on_midi_message(std::rc::Rc::new(|x| {
+    let mut input = access.input_for(&output).unwrap();
+
+    input.set_on_midi_message(std::rc::Rc::new(|x| {
         todo!("received msg");
     }));
+    println!("input {:?}", input);
     output.send(&[0x90, 100, 100], None);
 
     // for (i, e) in outputs.iter() {
