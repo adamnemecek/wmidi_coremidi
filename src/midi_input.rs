@@ -62,6 +62,14 @@ impl MIDIPort for MIDIInput {
         // todo!()
     }
 
+    fn name(&self) -> &str {
+        todo!()
+    }
+
+    fn kind(&self) -> MIDIPortKind {
+        MIDIPortKind::Input
+    }
+
     fn display_name(&self) -> &str {
         self.inner.display_name()
     }
@@ -286,9 +294,9 @@ fn midi_input_port_create(
                 f(next);
             }
         },
-    );
-    let block = block.copy();
-    let b: &MIDIReadBlock = &block;
+    ).copy();
+    // let block = block.copy();
+    // let b: &MIDIReadBlock = &block;
     // .copy();
 
     // let block = & *cblock.copy();
@@ -303,20 +311,10 @@ fn midi_input_port_create(
             client,
             name.as_concrete_TypeRef(),
             &mut out,
-            // &mut block.as_ptr(),
-            // block_ref as coremidi_sys::MIDIReadBlock,
-            // block_ref as *const _,
-            // block_ref as *mut std::ffi::c_void,
-            // &cblock.copy(),
-            // std::mem::transmute(cblock)
-            // &*block as *const block::Block<_, _> as *const std::ffi::c_void,
-            b,
+            &block,
         ));
     }
     assert!(out != 0);
-    // unsafe {
-    //     coremidi_sys::MIDIInputPortCreate(client, portName, readProc, refCon, outPort);
-    // }
 
     // if err == 0 {
     Some(out)

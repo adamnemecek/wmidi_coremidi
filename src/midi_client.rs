@@ -2,21 +2,14 @@ use core_foundation::base::{
     OSStatus,
     TCFType,
 };
-use coremidi_sys::{
-    MIDIClientRef,
-    MIDIReadBlock,
-    MIDIReadProc,
-    MIDITimeStamp,
-};
+// use coremidi_sys::{
+//     MIDIClientRef,
+//     MIDIReadBlock,
+//     MIDIReadProc,
+//     MIDITimeStamp,
+// };
 
 use crate::prelude::*;
-
-// typealias MIDIReadBlock = (UnsafePointer<MIDIPacketList>, UnsafeMutableRawPointer?) -> Void
-
-// pub struct MIDIEvent {
-//     pub timestamp: coremidi_sys::MIDITimeStamp,
-
-// }
 
 #[derive(Debug)]
 pub struct MIDIEvent<'a> {
@@ -47,10 +40,6 @@ impl<'a> From<&'a coremidi_sys::MIDIPacket> for MIDIEvent<'a> {
 //     fn next(&mut self) -> Option<Self::Item> {
 //         todo!()
 //     }
-// }
-
-// pub trait Hashable {
-//     fn get_hash(&self) -> u64;
 // }
 
 // impl<T: std::hash::Hash> Hashable for T {

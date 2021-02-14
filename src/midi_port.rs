@@ -36,22 +36,22 @@ impl From<i32> for MIDIPortID {
 
 impl std::fmt::Display for MIDIPortID {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MIDIPortID {{{}}}", self.inner)
+        write!(f, "MIDIPortID {{{:#x}}}", self.inner)
     }
 }
 
 impl std::fmt::Debug for MIDIPortID {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MIDIPortID {{{}}}", self.inner)
+        write!(f, "MIDIPortID {{{:#x}}}", self.inner)
     }
 }
 
 pub trait MIDIPort: Eq + Clone + std::hash::Hash + std::fmt::Debug {
     fn id(&self) -> MIDIPortID;
     fn manufacturer(&self) -> &str;
-    // fn name(&self) -> &str;
+    fn name(&self) -> &str;
     fn display_name(&self) -> &str;
-    // fn kind(&self) ->
+    fn kind(&self) -> MIDIPortKind;
     fn connection(&self) -> MIDIPortConnectionState;
     fn open(&mut self);
     fn close(&mut self);

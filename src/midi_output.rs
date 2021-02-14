@@ -30,6 +30,14 @@ impl MIDIPort for MIDIOutput {
         self.inner.id()
     }
 
+    fn kind(&self) -> MIDIPortKind {
+        MIDIPortKind::Output
+    }
+
+    fn name(&self) -> &str {
+        todo!()
+    }
+
     fn display_name(&self) -> &str {
         self.inner.display_name()
     }
@@ -43,7 +51,7 @@ impl MIDIPort for MIDIOutput {
     }
 
     fn close(&mut self) {
-        todo!()
+        self.inner.close()
     }
 
     fn connection(&self) -> MIDIPortConnectionState {
@@ -94,8 +102,7 @@ impl std::hash::Hash for MIDIOutput {
 #[derive(Clone)]
 struct MIDIOutputImpl {
     endpoint: MIDIEndpoint,
-    // port_ref:
-    port_ref: coremidi_sys::MIDIPortRef,
+    port_ref: Option<coremidi_sys::MIDIPortRef>,
     on_state_change: Option<std::rc::Rc<dyn Fn(MIDIOutput) -> ()>>,
     client: MIDIClient,
 }
@@ -113,7 +120,7 @@ impl MIDIOutputImpl {
         Self {
             client,
             endpoint,
-            port_ref: 0,
+            port_ref: None,
             on_state_change: None,
             // port: None,
         }
@@ -164,7 +171,7 @@ fn midi_output_port_create(
 
 impl MIDIOutputImpl {
     fn connection(&self) -> MIDIPortConnectionState {
-        if self.port_ref == 0 {
+        if self.port_ref.is_none() {
             MIDIPortConnectionState::Closed
         } else {
             MIDIPortConnectionState::Open
@@ -172,7 +179,7 @@ impl MIDIOutputImpl {
     }
 
     fn open(&mut self) {
-        self.port_ref = midi_output_port_create(self.client.inner(), "MIDI Output");
+        self.port_ref = Some(midi_output_port_create(self.client.inner(), "MIDI Output"));
         // self.inner.open()
     }
 
@@ -245,7 +252,7 @@ impl MIDIOutputImpl {
         };
         unsafe {
             os_assert(coremidi_sys::MIDISend(
-                self.port_ref,
+                self.port_ref.unwrap(),
                 self.endpoint.inner(),
                 &packet_list,
             ));
@@ -276,7 +283,7 @@ impl MIDIOutputImpl {
             return;
         }
         self.endpoint.flush();
-        self.port_ref = 0;
+        self.port_ref = None;
         if let Some(ref on_state_change) = self.on_state_change {
             on_state_change(MIDIOutput::new(self.client.clone(), self.endpoint.clone()))
         }
