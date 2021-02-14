@@ -149,6 +149,14 @@ impl MIDIInputImpl {
         
         println!("opened");
 
+        unsafe {
+            os_assert(coremidi_sys::MIDIPortConnectSource(
+                self.port_ref.unwrap(),
+                self.endpoint.inner(),
+                std::ptr::null_mut(),
+            ));
+        }
+
         // MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
         // guard connection != .open else { return }
 
