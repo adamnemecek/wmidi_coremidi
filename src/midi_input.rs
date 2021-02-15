@@ -6,42 +6,22 @@ use coremidi_sys::{
 
 use crate::prelude::*;
 
-// typedef void (^MIDIReadBlock)(const MIDIPacketList *pktlist, void *srcConnRefCon);
-
-// type MIDIReadBlock = block::Block<(*const coremidi_sys::MIDIPacketList, std::ffi::c_void), ()>;
-
 #[derive(PartialEq, Eq, Clone)]
 pub struct MIDIInput {
     inner: MIDIInputImpl,
-    // hash: u64,
 }
-
-// impl PartialEq for MIDIInput {
-//     fn eq(&self, other: &Self) -> bool {
-//         self.hash == other.hash
-//     }
-// }
-
-// impl Eq for MIDIInput {}
 
 impl MIDIInput {
     pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
         let inner = MIDIInputImpl::new(client, endpoint);
-        // let hash = crate::hash(&inner);
         Self {
-            // inner: std::sync::Arc::new(std::sync::Mutex::new(inner)),
             inner,
-            // hash,
         }
     }
 
     pub fn set_on_midi_message(&mut self, f: MIDIInputFn) {
         self.inner.set_on_midi_message(f)
     }
-
-    // pub fn receiver(&self) -> MIDIReceiver {
-    //     self.inner.receiver()
-    // }
 }
 
 impl std::fmt::Debug for MIDIInput {
@@ -92,7 +72,6 @@ impl MIDIPort for MIDIInput {
 }
 
 pub type MIDIInputFn = std::rc::Rc<dyn for<'r, 's> Fn(&'r MIDIEvent<'s>) -> ()>;
-// pub type MIDIChangeFn = std::rc::Rc<dyn
 
 #[derive(Clone)]
 struct MIDIInputImpl {
@@ -188,7 +167,6 @@ impl MIDIInputImpl {
     }
 
     fn close(&mut self) {
-        // guard connection != .closed else { return }
         if self.connection() == MIDIPortConnectionState::Closed {
             return;
         }
@@ -265,12 +243,7 @@ impl std::hash::Hash for MIDIInputImpl {
         self.endpoint.id().hash(state)
     }
 }
-// #[repr(transparent)]
-// struct Block {
 
-// }
-
-// pub type MIDIReadBlock = block::RcBlock<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void, ), ()>;
 pub type MIDIReadBlock =
     block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
 
