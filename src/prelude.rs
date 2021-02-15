@@ -25,4 +25,5 @@ pub use crate::{
     MIDIPortID,
     MIDIPortKind,
     MIDIPortMap,
+    StateChangeFn,
 };

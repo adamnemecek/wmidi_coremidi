@@ -55,4 +55,9 @@ pub trait MIDIPort: Eq + Clone + std::hash::Hash + std::fmt::Debug {
     fn connection(&self) -> MIDIPortConnectionState;
     fn open(&mut self);
     fn close(&mut self);
+
+    fn on_state_change(&self) -> Option<StateChangeFn<Self>>;
+    fn set_on_state_change(&mut self, on_state_change: Option<StateChangeFn<Self>>);
 }
+
+pub type StateChangeFn<T> = std::rc::Rc<dyn Fn(T) -> ()>;

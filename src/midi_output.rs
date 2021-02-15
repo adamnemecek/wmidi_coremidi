@@ -15,9 +15,7 @@ pub struct MIDIOutput {
 impl MIDIOutput {
     pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
         let inner = MIDIOutputImpl::new(client, endpoint);
-        Self {
-            inner,
-        }
+        Self { inner }
     }
 }
 
@@ -53,6 +51,14 @@ impl MIDIPort for MIDIOutput {
     fn connection(&self) -> MIDIPortConnectionState {
         self.inner.connection()
     }
+
+    fn on_state_change(&self) -> Option<std::rc::Rc<dyn Fn(Self) -> ()>> {
+        todo!()
+    }
+
+    fn set_on_state_change(&mut self, on_state_change: Option<std::rc::Rc<dyn Fn(Self) -> ()>>) {
+        todo!()
+    }
 }
 
 impl MIDIOutput {
@@ -62,10 +68,6 @@ impl MIDIOutput {
 
     // pub fn name(&self) -> &str {
     //     self.inner.name()
-    // }
-
-    // fn close(&mut self) {
-    //     self.inner.close();
     // }
 
     // fn connection(&self) -> MIDIPortConnectionState {
@@ -97,10 +99,10 @@ impl std::hash::Hash for MIDIOutput {
 
 #[derive(Clone)]
 struct MIDIOutputImpl {
+    client: MIDIClient,
     endpoint: MIDIEndpoint,
     port_ref: Option<coremidi_sys::MIDIPortRef>,
     on_state_change: Option<std::rc::Rc<dyn Fn(MIDIOutput) -> ()>>,
-    client: MIDIClient,
 }
 
 impl PartialEq for MIDIOutputImpl {

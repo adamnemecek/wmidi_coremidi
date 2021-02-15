@@ -1,8 +1,8 @@
-use coremidi_sys::{
-    MIDIInputPortCreate,
-    MIDIPortDisconnectSource,
-    MIDIPortRef,
-};
+// use coremidi_sys::{
+//     MIDIInputPortCreate,
+//     MIDIPortDisconnectSource,
+//     MIDIPortRef,
+// };
 
 use crate::prelude::*;
 
@@ -14,9 +14,7 @@ pub struct MIDIInput {
 impl MIDIInput {
     pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
         let inner = MIDIInputImpl::new(client, endpoint);
-        Self {
-            inner,
-        }
+        Self { inner }
     }
 
     pub fn set_on_midi_message(&mut self, f: MIDIInputFn) {
@@ -39,7 +37,6 @@ impl std::hash::Hash for MIDIInput {
 impl MIDIPort for MIDIInput {
     fn id(&self) -> MIDIPortID {
         self.inner.id()
-        // todo!()
     }
 
     fn name(&self) -> &str {
@@ -69,6 +66,14 @@ impl MIDIPort for MIDIInput {
     fn connection(&self) -> MIDIPortConnectionState {
         self.inner.connection()
     }
+
+    fn on_state_change(&self) -> Option<StateChangeFn<Self>> {
+        self.inner.on_state_change()
+    }
+
+    fn set_on_state_change(&mut self, on_state_change: Option<StateChangeFn<Self>>) {
+        self.inner.set_on_state_change(on_state_change);
+    }
 }
 
 pub type MIDIInputFn = std::rc::Rc<dyn for<'r, 's> Fn(&'r MIDIEvent<'s>) -> ()>;
@@ -78,11 +83,12 @@ struct MIDIInputImpl {
     client: MIDIClient,
     endpoint: MIDIEndpoint,
     port_ref: Option<coremidi_sys::MIDIPortRef>,
+    on_state_change: Option<StateChangeFn<MIDIInput>>,
     input_fn: Option<MIDIInputFn>,
 }
 // analogous to
 
-unsafe impl Send for MIDIInputImpl {}
+// unsafe impl Send for MIDIInputImpl {}
 
 impl PartialEq for MIDIInputImpl {
     fn eq(&self, other: &Self) -> bool {
@@ -97,9 +103,18 @@ impl MIDIInputImpl {
         Self {
             client,
             endpoint,
-            input_fn: None,
             port_ref: None,
+            on_state_change: None,
+            input_fn: None,
         }
+    }
+
+    fn on_state_change(&self) -> Option<StateChangeFn<MIDIInput>> {
+        self.on_state_change.clone()
+    }
+
+    fn set_on_state_change(&mut self, on_state_change: Option<StateChangeFn<MIDIInput>>) {
+        self.on_state_change = on_state_change;
     }
 
     fn name(&self) -> &str {
@@ -137,8 +152,6 @@ impl MIDIInputImpl {
             }
         });
 
-        println!("opened");
-
         unsafe {
             os_assert(coremidi_sys::MIDIPortConnectSource(
                 self.port_ref.unwrap(),
@@ -148,7 +161,6 @@ impl MIDIInputImpl {
         }
 
         // MIDIInputPortCreateWithBlock(client, portName, outPort, readBlock)
-        // guard connection != .open else { return }
 
         // switch type {
         // case .input:
