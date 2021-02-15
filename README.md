@@ -22,6 +22,9 @@ https://github.com/suzusuzu/virtualization-rs/blob/9d58132ef5b63ce403be292ea580d
 
 ### What's wmidi
 wmidi is an implementation of the WebMIDI API for macOS/iOS. On these OS, the native framework for working with MIDI is [CoreMIDI](https://developer.apple.com/reference/coremidi).
+
+The implementation is based on [`WebMIDIKit`](https://github.com/adamnemecek/WebMIDIKit), a framework with the same API in Swift.
+
 CoreMIDI is old and the API is entirely in C (💩). Using it involves a lot of void pointer casting (💩^9.329), and other unspeakable things. Furthermore, some of the APIs didn't quite survive the transition to Swift and are essentially unusable in Swift (`MIDIPacketList` APIs, I'm looking at you).
 
 CoreMIDI is also extremely verbose and error prone. Selecting an input port and receiving data from it is __~80 lines__ of [convoluted Swift code](http://mattg411.com/coremidi-swift-programming/). __wmidi let's you do the same thing in 1.__
@@ -37,19 +40,19 @@ use wmidi_coremidi::prelude::*;
 let access = MIDIAccess::new();
 
 /// prints all MIDI inputs available to the console and asks the user which port they want to select
-let inputPort: Option<MIDIInput> = access.inputs.prompt()
+let inputPort: Option<&MIDIInput> = access.inputs().prompt();
 
 /// Receiving MIDI events
 /// set the input port's onMIDIMessage callback which gets called when the port receives MIDI packets
-inputPort?.onMIDIMessage = { (packet: MIDIPacket) in
-	print("received \(packet)")
-}
+inputPort.unwrap().set_on_midi_message(std::rc::Rc::new(|x: MIDIEvent<'_>| {
+
+}))
 
 ```
 
 
 ### Selecting an output port and sending MIDI packets to it
-```swift
+```rust
 /// select an output port
 let outputPort: MIDIOutput? = midi.outputs.prompt()
 
@@ -81,20 +84,20 @@ outputPort.map {
 
 If the output port you want to select has a corresponding input port you can also do
 
-```swift
+```rust
 let outputPort: MIDIOutput? = midi.output(for: inputPort)
 ```
 
 Similarly, you can find an input port for the output port.
 
-```swift
+```rust
 let inputPort2: MIDIInput? = midi.input(for: outputPort)
 ```
 
 ### Looping over ports
 
 Port maps are dictionary like collections of `MIDIInputs` or `MIDIOutputs` that are indexed with the port's id. As a result, you cannot index into them like you would into an array (the reason for this being that the endpoints can be added and removed so you cannot reference them by their index).
-```swift
+```rust
 for (id, port) in midi.inputs {
 	print(id, port)
 }
@@ -106,7 +109,7 @@ for (id, port) in midi.inputs {
 
 Use Swift Package Manager. Add the following `.Package` entry into your dependencies.
 
-```swift
+```rust
 .Package(url: "https://github.com/adamnemecek/webmidikit", from: "1.0.0")
 ```
 
@@ -117,10 +120,10 @@ Use Swift Package Manager. Add the following `.Package` entry into your dependen
 ### MIDIAccess
 Represents the MIDI session. See [spec](https://www.w3.org/TR/webmidi/#midiaccess-interface).
 
-```swift
-class MIDIAccess {
+```rust
+struct MIDIAccess {
 	/// collections of MIDIInputs and MIDIOutputs currently connected to the computer
-	var inputs: MIDIInputMap { get }
+	fn inputs() MIDIInputMap { get }
 	var outputs: MIDIOutputMap { get }
 
 	/// will be called if a port changes either connection state or port state
@@ -144,32 +147,48 @@ See [spec](https://www.w3.org/TR/webmidi/#midiport-interface). Represents the ba
 
 Note that you don't construct MIDIPorts nor it's subclasses yourself, you only get them from the `MIDIAccess` object. Also note that you only ever deal with subclasses or `MIDIPort` (`MIDIInput` or `MIDIOutput`) never `MIDIPort` itself.
 
-```swift
-class MIDIPort {
+```rust
+pub trait MIDIPort: Eq + Clone + std::hash::Hash + std::fmt::Debug {
+    fn id(&self) -> MIDIPortID;
+    fn manufacturer(&self) -> &str;
+    fn name(&self) -> &str;
+    /// .input (for MIDIInput) or .output (for MIDIOutput)
+    fn kind(&self) -> MIDIPortKind;
 
-	var id: Int { get }
-	var manufacturer: String { get }
+    fn display_name(&self) -> &str;
+    fn connection(&self) -> MIDIPortConnectionState;
+    fn open(&mut self);
+    fn close(&mut self);
 
-	var name: String { get }
-
-	/// .input (for MIDIInput) or .output (for MIDIOutput)
-	var type: MIDIPortType { get }
-
-	var version: Int { get }
-
-	/// .connected | .disconnected,
-	/// indicates if the port's endpoint is connected or not
-	var state: MIDIPortDeviceState { get }
-
-	/// .open | .closed
-	var connection: MIDIPortConnectionState { get }
-
-	/// open the port, is called implicitly when MIDIInput's onMIDIMessage is set or MIDIOutputs' send is called
-	func open()
-
-	/// closes the port
-	func close()
+    fn on_state_change(&self) -> Option<StateChangeFn<Self>>;
+    fn set_on_state_change(&mut self, on_state_change: Option<StateChangeFn<Self>>);
 }
+
+// struct MIDIPort {
+
+// 	fn id() -> ;
+// 	var manufacturer: String { get }
+
+// 	var name: String { get }
+
+// 	/// .input (for MIDIInput) or .output (for MIDIOutput)
+// 	var type: MIDIPortType { get }
+
+// 	var version: Int { get }
+
+// 	/// .connected | .disconnected,
+// 	/// indicates if the port's endpoint is connected or not
+// 	var state: MIDIPortDeviceState { get }
+
+// 	/// .open | .closed
+// 	var connection: MIDIPortConnectionState { get }
+
+// 	/// open the port, is called implicitly when MIDIInput's onMIDIMessage is set or MIDIOutputs' send is called
+// 	func open()
+
+// 	/// closes the port
+// 	func close()
+// }
 ```
 
 ### MIDIInput
@@ -178,8 +197,8 @@ Allows for receiving data send to the port.
 
 See [spec](https://www.w3.org/TR/webmidi/#midiinput-interface).
 
-```swift
-class MIDIInput: MIDIPort {
+```rust
+struct MIDIInput: MIDIPort {
 	/// set this and it will get called when the port receives messages.
 	var onMIDIMessage: ((MIDIPacket) -> ())? = nil { get set }
 }
@@ -190,17 +209,17 @@ class MIDIInput: MIDIPort {
 
 
 See [spec](https://www.w3.org/TR/webmidi/#midioutput-interface).
-```swift
-class MIDIOutput: MIDIPort {
+```rust
+struct MIDIOutput: MIDIPort {
 
 	/// send data to port, note that unlike the WebMIDI API,
 	/// the last parameter specifies offset from now, when the event should be scheduled (as opposed to absolute timestamp)
 	/// the unit remains milliseconds though.
 	/// note that right now, WebMIDIKit doesn't support sending multiple packets in the same call, to send multiple packets, you need on call per packet
-	func send<S: Sequence>(_ data: S, offset: Timestamp = 0) -> MIDIOutput where S.Iterator.Element == UInt8
+	fn send(_ data: &[u8], offset: TimeStamp);
 
 	// clear all scheduled but yet undelivered midi events
-	func clear()
+	fn clear();
 }
 ```
 

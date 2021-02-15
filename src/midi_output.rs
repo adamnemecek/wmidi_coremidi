@@ -1,10 +1,3 @@
-// use coremidi_sys::{
-//     // MIDIOutputPortCreate,
-//     MIDIPacketList,
-//     MIDIPortRef,
-//     MIDIReceived,
-// };
-
 use crate::prelude::*;
 
 #[derive(Clone, PartialEq, Eq)]
@@ -193,16 +186,9 @@ impl MIDIOutputImpl {
         self.endpoint.display_name()
     }
 
-    // fn display_name1(&self) -> String {
-    //     self.endpoint.display_name1()
-    // }
-
     fn manufacturer(&self) -> &str {
         self.endpoint.manufacturer()
     }
-    // pub fn name(&self) -> &str {
-    // self.endpoint.name()
-    // }
 
     // public func send<S: Sequence>(_ data: S, offset: Double? = nil) -> MIDIOutput where S.Iterator.Element == UInt8 {
     //     open()
@@ -269,7 +255,7 @@ impl MIDIOutputImpl {
         // MIDISender::new(&self.client, self.endpoint.clone(), port)
     }
 
-    pub fn clear(&self) {
+    fn clear(&self) {
         self.endpoint.flush();
     }
 

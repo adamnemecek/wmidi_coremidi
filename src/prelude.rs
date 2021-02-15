@@ -13,8 +13,6 @@ pub(crate) use crate::{
 pub use crate::{
     MIDIAccess,
     MIDIEvent,
-    // MIDIReceiver,
-    // MIDISender,
     MIDIInput,
     MIDIOutput,
     // MIDIPacket,
