@@ -1,8 +1,5 @@
 use crate::prelude::*;
 
-// use core_foundation::string::__CFString;
-// use coremidi_sys::MIDIEndpointRef;
-
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum MIDIEndpointKind {
     Device,
@@ -66,13 +63,9 @@ impl MIDIEndpoint {
     pub fn display_name(&self) -> &str {
         self.inner.display_name()
     }
-
-    // pub fn display_name1(&self) -> String {
-    //     self.inner.display_name1()
-    // }
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 struct MIDIEndpointImpl {
     inner: coremidi_sys::MIDIEndpointRef,
 }
@@ -81,14 +74,9 @@ impl MIDIEndpointImpl {
     fn inner(&self) -> coremidi_sys::MIDIEndpointRef {
         self.inner
     }
+
     fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
         Self { inner }
-    }
-}
-
-impl std::hash::Hash for MIDIEndpointImpl {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.id().hash(state)
     }
 }
 
@@ -135,7 +123,6 @@ impl std::fmt::Debug for MIDIEndpointImpl {
 impl MIDIEndpointImpl {
     fn id(&self) -> MIDIPortID {
         let id = unsafe { self.i32_property(coremidi_sys::kMIDIPropertyUniqueID) };
-
         MIDIPortID::new(id as _)
     }
 
@@ -147,10 +134,6 @@ impl MIDIEndpointImpl {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyName) }
     }
 
-    // fn display_name1(&self) -> String {
-    //     unsafe { self.string_property(coremidi_sys::kMIDIPropertyDisplayName) }
-    // }
-
     fn display_name(&self) -> &str {
         unsafe { self.str_property(coremidi_sys::kMIDIPropertyDisplayName) }
     }
@@ -160,7 +143,6 @@ impl MIDIEndpointImpl {
         let mut kind = 0;
 
         unsafe {
-            // coremidi_sys::MIDIObjectFindByUniqueID(self.inner)
             os_assert(coremidi_sys::MIDIObjectFindByUniqueID(
                 self.id().inner,
                 &mut obj,

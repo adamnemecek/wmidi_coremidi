@@ -1,32 +1,28 @@
-use coremidi_sys::{
-    // MIDIOutputPortCreate,
-    MIDIPacketList,
-    MIDIPortRef,
-    MIDIReceived,
-};
+// use coremidi_sys::{
+//     // MIDIOutputPortCreate,
+//     MIDIPacketList,
+//     MIDIPortRef,
+//     MIDIReceived,
+// };
 
 use crate::prelude::*;
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct MIDIOutput {
     inner: MIDIOutputImpl,
-    // hash: u64,
 }
 
 impl MIDIOutput {
     pub(crate) fn new(client: MIDIClient, endpoint: MIDIEndpoint) -> Self {
         let inner = MIDIOutputImpl::new(client, endpoint);
-        // let hash = crate::hash(&port);
         Self {
-            // inner: std::sync::Arc::new(std::sync::Mutex::new(port)),
-            inner, // hash,
+            inner,
         }
     }
 }
 
 impl MIDIPort for MIDIOutput {
     fn id(&self) -> MIDIPortID {
-        // MIDIPortID::new(self.inner.borrow().id())
         self.inner.id()
     }
 

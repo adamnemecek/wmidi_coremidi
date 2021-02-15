@@ -2,12 +2,6 @@ use core_foundation::base::{
     OSStatus,
     TCFType,
 };
-// use coremidi_sys::{
-//     MIDIClientRef,
-//     MIDIReadBlock,
-//     MIDIReadProc,
-//     MIDITimeStamp,
-// };
 
 use crate::prelude::*;
 
