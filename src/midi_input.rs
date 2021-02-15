@@ -274,15 +274,14 @@ impl std::hash::Hash for MIDIInputImpl {
 pub type MIDIReadBlock =
     block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
 
+#[allow(improper_ctypes)]
 #[link(name = "CoreMIDI", kind = "framework")]
 extern "C" {
     fn MIDIInputPortCreateWithBlock(
         client: u32,
-        portName: *const core_foundation::string::__CFString,
+        port_name: *const core_foundation::string::__CFString,
         outPort: *mut u32,
-        // readBlock: &block::Block<(*const std::ffi::c_void, *mut std::ffi::c_void), ()>,
-        // readBlock: *const std::ffi::c_void,
-        readBlock: &MIDIReadBlock,
+        read_block: &MIDIReadBlock,
     ) -> i32;
 }
 
@@ -303,17 +302,9 @@ fn midi_input_port_create(
         },
     )
     .copy();
-    // let block = block.copy();
-    // let b: &MIDIReadBlock = &block;
-    // .copy();
-
-    // let block = & *cblock.copy();
-    // unsafe { CFRunLoopPerformBlock(run_loop_ref as *mut c_void, kCFRunLoopDefaultMode, block); }
 
     let name = core_foundation::string::CFString::new(name);
     let mut out = 0;
-    // let block_ref = &mut block;
-    // let p: std::ffi::c_void = unsafe { std::mem::transmute(cblock) };
     unsafe {
         os_assert(MIDIInputPortCreateWithBlock(
             client,
