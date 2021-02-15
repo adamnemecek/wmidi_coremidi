@@ -29,8 +29,8 @@ impl From<coremidi_sys::MIDIObjectType> for MIDIEndpointKind {
 }
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Debug, Hash)]
-pub struct MIDIEndpoint {
-    inner: MIDIEndpointImpl,
+pub(crate) struct MIDIEndpoint {
+    inner: std::rc::Rc<MIDIEndpointImpl>,
 }
 
 impl MIDIEndpoint {
@@ -38,29 +38,29 @@ impl MIDIEndpoint {
         self.inner.inner()
     }
 
-    pub fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
+    pub(crate) fn new(inner: coremidi_sys::MIDIEndpointRef) -> Self {
         Self {
-            inner: MIDIEndpointImpl::new(inner),
+            inner: MIDIEndpointImpl::new(inner).into(),
         }
     }
 
-    pub fn flush(&self) {
+    pub(crate) fn flush(&self) {
         self.inner.flush();
     }
 
-    pub fn id(&self) -> MIDIPortID {
+    pub(crate) fn id(&self) -> MIDIPortID {
         self.inner.id()
     }
 
-    pub fn manufacturer(&self) -> &str {
+    pub(crate) fn manufacturer(&self) -> &str {
         self.inner.manufacturer()
     }
 
-    pub fn name(&self) -> &str {
+    pub(crate) fn name(&self) -> &str {
         self.inner.name()
     }
 
-    pub fn display_name(&self) -> &str {
+    pub(crate) fn display_name(&self) -> &str {
         self.inner.display_name()
     }
 }
