@@ -18,9 +18,6 @@ pub use midi_input::*;
 mod midi_output;
 pub use midi_output::*;
 
-mod midi_channel;
-pub use midi_channel::*;
-
 mod midi_packet;
 pub use midi_packet::*;
 

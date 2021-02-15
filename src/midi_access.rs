@@ -5,7 +5,6 @@ use crate::{
 
 pub struct MIDIAccess {
     inner: std::rc::Rc<MIDIAccessImpl>,
-    // inner: std::sync::Arc<std::sync::Mutex<MIDIAccessImpl>>,
 }
 
 impl MIDIAccess {

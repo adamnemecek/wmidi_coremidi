@@ -52,10 +52,6 @@ impl<'a> From<&'a coremidi_sys::MIDIPacket> for MIDIEvent<'a> {
 //     }
 // }
 
-// extern "C" {
-//     fn
-// }
-
 pub(crate) fn hash<T: std::hash::Hash>(v: &T) -> u64 {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::Hasher;
@@ -64,21 +60,10 @@ pub(crate) fn hash<T: std::hash::Hash>(v: &T) -> u64 {
     s.finish()
 }
 
-#[derive(Clone)]
-// needs to be arc so that it
+#[derive(Clone, PartialEq, Eq)]
 pub(crate) struct MIDIClient {
     inner: std::rc::Rc<MIDIClientImpl>,
-    // hash: u64,
 }
-
-impl PartialEq for MIDIClient {
-    fn eq(&self, other: &Self) -> bool {
-        self.inner == other.inner
-    }
-}
-
-impl Eq for MIDIClient {}
-// input_observer: Option<std::sync::Arc<std::sync::Mutex<Box<dyn MIDIInputObserver>>>>,
 
 impl MIDIClient {
     pub fn inner(&self) -> coremidi_sys::MIDIClientRef {
@@ -132,29 +117,20 @@ impl MIDIClient {
     // }
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 struct MIDIClientImpl {
     inner: coremidi_sys::MIDIClientRef,
 }
 
-// type MIDIReceiveBlock = block::Block<(*const coremidi_sys::MIDIPacketList), ()>;
-
-// coremidi_sys::MIDIReadBlock
 impl MIDIClientImpl {
     pub(crate) fn inner(&self) -> coremidi_sys::MIDIClientRef {
         self.inner
     }
-    // fn new(name: &str) -> Self {
-    //     Self {
-    //         inner: MIDIClientCreate(name, |x| { }),
-    //     }
-    // }
-
     fn notification(&mut self, u: u32) {}
 
     fn new(name: &str, f: impl Fn(MIDINotification) -> () + 'static) -> Self {
         Self {
-            inner: MIDIClientCreate(name, f),
+            inner: midi_client_create(name, f),
         }
     }
 
@@ -262,17 +238,17 @@ impl MIDIClientImpl {
     // }
 }
 
-impl std::hash::Hash for MIDIClientImpl {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.inner.hash(state)
-    }
-}
+// impl std::hash::Hash for MIDIClientImpl {
+//     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+//         self.inner.hash(state)
+//     }
+// }
 
-impl PartialOrd for MIDIClientImpl {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.inner.partial_cmp(&other.inner)
-    }
-}
+// impl PartialOrd for MIDIClientImpl {
+//     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+//         self.inner.partial_cmp(&other.inner)
+//     }
+// }
 
 impl Drop for MIDIClientImpl {
     fn drop(&mut self) {
@@ -292,7 +268,7 @@ extern "C" {
 }
 
 #[allow(non_snake_case)]
-fn MIDIClientCreate(
+fn midi_client_create(
     name: &str,
     f: impl Fn(MIDINotification) -> () + 'static,
 ) -> coremidi_sys::MIDIClientRef {
