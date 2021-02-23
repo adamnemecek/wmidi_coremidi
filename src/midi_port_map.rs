@@ -22,7 +22,7 @@ pub struct MIDIPortMap<T: MIDIPort> {
 }
 
 impl<T: MIDIPort> MIDIPortMap<T> {
-    pub fn iter(&self) -> MIDIPortMapImplIterator<'_, T> {
+    pub fn iter(&self) -> impl Iterator<Item = (MIDIPortID, T)> + '_ {
         self.inner.iter()
     }
 }
@@ -68,7 +68,7 @@ impl<T: MIDIPort> MIDIPortMapImpl<T> {
         self.inner.insert(port.id(), port);
     }
 
-    pub fn iter(&self) -> MIDIPortMapImplIterator<'_, T> {
+    pub fn iter(&self) -> impl Iterator<Item = (MIDIPortID, T)> + '_ {
         MIDIPortMapImplIterator {
             inner: self.inner.iter(),
         }
