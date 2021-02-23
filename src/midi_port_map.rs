@@ -1,5 +1,8 @@
 use crate::prelude::*;
 
+pub type MIDIInputMap = MIDIPortMap<MIDIInput>;
+pub type MIDIOutputMap = MIDIPortMap<MIDIOutput>;
+
 pub struct MIDIPortMapImplIterator<'a, T: MIDIPort> {
     inner: std::collections::hash_map::Iter<'a, MIDIPortID, T>,
 }
