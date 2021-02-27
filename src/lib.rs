@@ -40,7 +40,7 @@ mod midi_timestamp;
 pub use midi_timestamp::*;
 
 mod midi_notification;
-use midi_notification::*;
+pub use midi_notification::*;
 
 // mod prelude;
 // pub use prelude::*;

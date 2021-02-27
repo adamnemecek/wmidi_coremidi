@@ -7,7 +7,6 @@ pub fn os_assert(status: i32) {
 pub(crate) use crate::{
     MIDIClient,
     MIDIEndpoint,
-    MIDINotification,
 };
 
 pub use crate::{
@@ -15,6 +14,7 @@ pub use crate::{
     MIDIEvent,
     MIDIInput,
     MIDIInputMap,
+    MIDINotification,
     MIDIOutput,
     MIDIOutputMap,
     // MIDIPacket,
