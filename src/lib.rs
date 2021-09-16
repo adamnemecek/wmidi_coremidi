@@ -3,6 +3,8 @@
 
 pub mod prelude;
 
+mod core_midi;
+
 mod midi_access;
 pub use midi_access::*;
 

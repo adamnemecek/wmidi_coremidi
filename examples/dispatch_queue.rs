@@ -32,9 +32,7 @@ impl DispatchQueue {
     }
 
     pub fn dispatch_async(&self, f: impl Fn() -> () + 'static) {
-        let block = block::ConcreteBlock::new(move || {
-            f()
-        }).copy();
+        let block = block::ConcreteBlock::new(move || f()).copy();
         unsafe {
             dispatch_async(*self, &block);
         }
@@ -42,12 +40,11 @@ impl DispatchQueue {
 }
 
 fn main() {
-
     let queue = DispatchQueue::new("label");
     queue.dispatch_async(|| {
         println!("async dispatched");
     });
-    
+
     // let queue = unsafe {
     //     dispatch_queue_create(
     //         b"fun::fun_capture::QuartzCapture\0".as_ptr() as *const _,
