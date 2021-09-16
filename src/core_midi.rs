@@ -1,25 +1,47 @@
-pub type MIDITimeStamp = u64;
 
+
+#[link(name = "CoreAudio", kind = "framework")]
+extern "C" {
+    fn AudioGetCurrentHostTime() -> u64;
+    fn AudioConvertNanosToHostTime(nanos: u64) -> u64;
+}
+
+// pub type MIDITimeStamp = u64;
+
+pub type UInt8 = ::std::os::raw::c_uchar;
+pub type UInt16 = ::std::os::raw::c_ushort;
+pub type UInt32 = ::std::os::raw::c_uint;
+pub type SInt32 = ::std::os::raw::c_int;
+pub type UInt64 = ::std::os::raw::c_ulonglong;
+pub type OSStatus = SInt32;
+pub type ByteCount = ::std::os::raw::c_ulong;
 pub type ItemCount = ::std::os::raw::c_ulong;
-pub type MIDIClientRef = ();
-pub type MIDIEndpointRef = ();
-pub type MIDIPacket = ();
-pub type MIDIPacketList = ();
-pub type OSStatus = u32;
-pub type MIDIPortRef = ();
+pub type Boolean = ::std::os::raw::c_uchar;
+pub type Byte = UInt8;
+
+
+pub type MIDIObjectRef = UInt32;
+pub type MIDIClientRef = MIDIObjectRef;
+pub type MIDIPortRef = MIDIObjectRef;
+pub type MIDIDeviceRef = MIDIObjectRef;
+pub type MIDIEntityRef = MIDIObjectRef;
+pub type MIDIEndpointRef = MIDIObjectRef;
+pub type MIDITimeStamp = UInt64;
+pub type MIDIObjectType = SInt32;
+
 
 // #[repr()]
-enum MIDIObjectType {
-    // pub const kMIDIObjectType_Other: _bindgen_ty_65 = -1;
-// pub const kMIDIObjectType_Device: _bindgen_ty_65 = 0;
-// pub const kMIDIObjectType_Entity: _bindgen_ty_65 = 1;
-// pub const kMIDIObjectType_Source: _bindgen_ty_65 = 2;
-// pub const kMIDIObjectType_Destination: _bindgen_ty_65 = 3;
-// pub const kMIDIObjectType_ExternalDevice: _bindgen_ty_65 = 16;
-// pub const kMIDIObjectType_ExternalEntity: _bindgen_ty_65 = 17;
-// pub const kMIDIObjectType_ExternalSource: _bindgen_ty_65 = 18;
-// pub const kMIDIObjectType_ExternalDestination: _bindgen_ty_65 = 19;
-}
+// enum MIDIObjectType {
+//     // pub const kMIDIObjectType_Other: _bindgen_ty_65 = -1;
+// // pub const kMIDIObjectType_Device: _bindgen_ty_65 = 0;
+// // pub const kMIDIObjectType_Entity: _bindgen_ty_65 = 1;
+// // pub const kMIDIObjectType_Source: _bindgen_ty_65 = 2;
+// // pub const kMIDIObjectType_Destination: _bindgen_ty_65 = 3;
+// // pub const kMIDIObjectType_ExternalDevice: _bindgen_ty_65 = 16;
+// // pub const kMIDIObjectType_ExternalEntity: _bindgen_ty_65 = 17;
+// // pub const kMIDIObjectType_ExternalSource: _bindgen_ty_65 = 18;
+// // pub const kMIDIObjectType_ExternalDestination: _bindgen_ty_65 = 19;
+// }
 
 #[link(name = "CoreMIDI", kind = "framework")]
 extern "C" {
@@ -43,7 +65,6 @@ extern "C" {
     // ./midi_packet.rs:    pub(crate) fn from(ptr: &coremidi_sys::MIDIPacket) -> Self {
 
     // ./midi_packet.rs:        // let z = coremidi_sys::AudioGetCurrentHostTime();
-    fn AudioGetCurrentHostTime();
 
     // ./midi_packet_list.rs:            // let packet = unsafe { &*(self.inner as *const coremidi_sys::MIDIPacket) };
 

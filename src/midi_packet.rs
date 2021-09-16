@@ -29,12 +29,6 @@ impl std::fmt::Debug for MIDIPacket {
     }
 }
 
-#[link(name = "CoreAudio", kind = "framework")]
-extern "C" {
-    fn AudioGetCurrentHostTime() -> u64;
-    fn AudioConvertNanosToHostTime(nanos: u64) -> u64;
-}
-
 // pub(crate) type MIDIReadBlock =
 //     block::Block<(*const coremidi_sys::MIDIPacketList, *mut std::ffi::c_void), ()>;
 
