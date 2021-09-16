@@ -111,7 +111,6 @@ impl From<&MIDIPacket> for coremidi_sys::MIDIPacket {
             length: a.len() as _,
             data: a.data,
             timeStamp: a.timestamp,
-            __padding: [0; 2],
         }
     }
 }

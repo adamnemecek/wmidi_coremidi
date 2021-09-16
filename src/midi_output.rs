@@ -232,7 +232,6 @@ impl MIDIOutputImpl {
             timeStamp: 0,
             length: data.len() as _,
             data: d,
-            __padding: [0; 2],
         };
         let packet_list = coremidi_sys::MIDIPacketList {
             numPackets: 1,
